@@ -1,0 +1,59 @@
+app/
+├── layout.tsx                  # Root layout
+├── page.tsx                    # Landing Page
+├── login/page.tsx             # Login page
+├── register/page.tsx          # Register page
+├── dashboard/                 # Halaman dashboard utama
+│   ├── layout.tsx             # Layout dashboard: sidebar/header
+│   ├── page.tsx               # Redirect user berdasarkan role
+│   ├── admin/                 # Halaman khusus admin
+│   │   ├── page.tsx           # Dashboard statistik
+│   │   ├── users/             # Manajemen user
+│   │   │   ├── page.tsx       # List user
+│   │   │   └── [id]/page.tsx  # Detail user
+│   │   ├── tickets/           # Semua tiket
+│   │   │   ├── page.tsx       # List semua tiket
+│   │   │   └── [id]/page.tsx  # Detail tiket
+│   │   ├── categories/        # Manajemen kategori tiket
+│   │   │   └── page.tsx
+│   │   ├── priorities/        # Manajemen prioritas tiket
+│   │   │   └── page.tsx
+│   ├── staff/                 # Halaman khusus staff
+│   │   ├── page.tsx           # Tiket yang ditugaskan ke staff
+│   │   └── tickets/
+│   │       ├── page.tsx       # List tiket staff
+│   │       └── [id]/page.tsx  # Detail dan balasan tiket
+│   ├── user/                  # Halaman khusus user
+│   │   ├── page.tsx           # Ringkasan tiket
+│   │   └── tickets/
+│   │       ├── page.tsx       # Daftar tiket user
+│   │       ├── new/page.tsx   # Form buat tiket
+│   │       └── [id]/page.tsx  # Detail tiket user
+
+components/
+├── Sidebar.tsx
+├── TicketCard.tsx
+├── TicketForm.tsx
+├── ReplyList.tsx
+├── UserTable.tsx
+├── CategoryForm.tsx
+├── PriorityForm.tsx
+
+lib/
+├── db.ts                      # Koneksi ke PostgreSQL (Prisma/pg)
+├── auth.ts                    # Helper untuk session & role
+
+prisma/
+├── schema.prisma              # Skema Prisma ORM
+
+public/
+├── uploads/                   # (opsional) folder lampiran lokal
+
+utils/
+├── constants.ts               # ENUM role, status, prioritas
+├── api.ts                     # Client-side API fetcher
+
+middleware.ts                  # Untuk proteksi route (Next.js Middleware)
+.env                           # Environment variables
+next.config.js                 # Konfigurasi Next.js
+tsconfig.json                  # TypeScript config

@@ -1,0 +1,38 @@
+Fitur Utama Sistem Tiketing
+1. Autentikasi & Otorisasi
+
+Login / Register (Admin, Staff, User)
+
+Role-based Access Control
+
+2. Manajemen Tiket
+
+Buat Tiket (oleh User)
+
+Lihat daftar tiket (filter berdasarkan status, prioritas, dll)
+
+Balas tiket (oleh Staff/Admin)
+
+Ubah status tiket: Open, In Progress, Closed
+
+3. Kategori & Prioritas Tiket
+
+Kategori: IT, Billing, Complaint, dll
+
+Prioritas: Low, Medium, High, Urgent
+
+4. Notifikasi
+
+Email/notif ketika tiket dibuat / dibalas / status berubah
+
+5. Dashboard Admin
+
+Statistik jumlah tiket per kategori, status, user
+
+6. Komentar/Log Diskusi
+
+Setiap balasan pada tiket tersimpan sebagai log/discussion
+
+7. Lampiran (optional)
+
+Upload file gambar/pdf terkait tiket
