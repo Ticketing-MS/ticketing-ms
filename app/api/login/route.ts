@@ -32,13 +32,13 @@ export async function POST(req: Request) {
         name: user.name,
         email: user.email,
         role: user.role,
-        isActive: user.isActive, // optional: kalau mau dicek di middleware
+        isActive: user.isActive, 
       }),
       {
-        httpOnly: false, // bisa true untuk security lebih tinggi
+        httpOnly: false, 
         path: "/",
         sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 7, // 7 hari
+        maxAge: 300, 
       }
     );
 

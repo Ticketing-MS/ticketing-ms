@@ -61,10 +61,8 @@ export default function SidebarAdmin() {
             </Link>
           ))}
 
-        {/* JEDA / SECTION BREAK */}
         <div className="my-4 border-t border-gray-300"></div>
 
-        {/* LABEL UNTUK BAGIAN LAINNYA */}
         {user.role === "admin" && (
           <>
             <div className="mb-2 text-sm text-gray-500 font-semibold uppercase tracking-wide">
