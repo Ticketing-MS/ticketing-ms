@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import SidebarAdmin from "components/SidebarAdmin";
 import Navbar from "components/Navbar";
+import AdminUserTable from "components/AdminUserTable.tsx";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -17,24 +18,24 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="flex">
+    <div className="flex overflow-y-auto">
       <SidebarAdmin />
 
-      <main className="ml-64 w-full min-h-screen bg-gray-100 p-6">
+      <main className="ml-64 w-full min-h-screen bg-gray-100 min-h-screen p-6">
         <Navbar />
 
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          Admin Dashboard
+          Dashboard Admin
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-white shadow p-4 rounded-lg text-gray-700">
-            Statistik
+            Tiket Active Cloud
           </div>
           <div className="bg-white shadow p-4 rounded-lg text-gray-700">
-            Manajemen User
+            Tiket Active Devops
           </div>
           <div className="bg-white shadow p-4 rounded-lg text-gray-700">
-            Pengaturan
+            <AdminUserTable />
           </div>
         </div>
       </main>

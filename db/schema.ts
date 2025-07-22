@@ -1,4 +1,5 @@
 import {
+  boolean,
   pgTable,
   serial,
   text,
@@ -16,7 +17,7 @@ export const users = pgTable('users', {
   password: varchar('password', { length: 255 }).notNull(),
   role: text('role').default('user').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
-  phone: varchar('phone', { length: 20 }),
+  isActive: boolean("is_active").default(true),
   access: text('access').array().default([]),
 });
 

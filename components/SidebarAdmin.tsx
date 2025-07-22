@@ -1,55 +1,52 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 
-type User = {
-  role: string;
-  access?: string[]; // untuk PM: ["cloud", "devops"]
-};
-
-export default function Sidebar() {
+export default function SidebarAdmin() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<{ role: string; access?: string[] } | null>(
+    null
+  );
 
   useEffect(() => {
     const raw = localStorage.getItem("user");
     if (raw) setUser(JSON.parse(raw));
   }, []);
 
-  const fullMenu = [
+  const mainMenu = [
     { name: "Dashboard", href: "/admin", role: "admin" },
+    { name: "Semua Tiket", href: "/admin/tiket", role: "admin" },
     { name: "Cloud", href: "/admin/cloud", role: "cloud" },
     { name: "DevOps", href: "/admin/devops", role: "devops" },
     { name: "Project Manager", href: "/admin/pm", role: "pm" },
   ];
 
+  const adminOnlyMenu = [
+    { name: "Statistik & Laporan", href: "/admin/statistik", role: "admin" },
+    { name: "Pengaturan Sistem", href: "/admin/pengaturan", role: "admin" },
+  ];
+
   if (!user) return null;
 
-  const visibleMenu = fullMenu.filter((item) => {
-    if (user.role === "admin") return true;
-    if (user.role === item.role) return true;
-    if (user.role === "pm" && user.access?.includes(item.role)) return true;
-    return false;
-  });
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    router.push("/login");
-  };
-
   return (
-    <aside className="fixed top-0 left-0 h-screen w-64 bg-white border-r shadow-sm px-6 py-8 flex flex-col justify-between">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-8">
-          {user.role.toUpperCase()} Panel
-        </h2>
+    <aside className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg p-4 z-50">
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-gray-800">Admin Panel</h2>
+      </div>
 
-        <nav className="flex flex-col gap-2">
-          {visibleMenu.map((item) => (
+      <nav className="flex flex-col gap-2">
+        {/* MAIN MENU */}
+        {mainMenu
+          .filter(
+            (item) =>
+              user.role === "admin" ||
+              item.role === user.role ||
+              (user.role === "pm" && user.access?.includes(item.role))
+          )
+          .map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -64,7 +61,28 @@ export default function Sidebar() {
             </Link>
           ))}
 
-          {user.role === "admin" && (
+        {user.role === "admin" && (
+          <>
+            <div className="mt-4 mb-2 text-sm text-gray-500 font-semibold uppercase tracking-wide">
+              Lainnya
+            </div>
+
+            {adminOnlyMenu.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={clsx(
+                  "text-base px-4 py-2 rounded-md hover:bg-blue-100 transition",
+                  pathname === item.href
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-700"
+                )}
+              >
+                {item.name}
+              </Link>
+            ))}
+
+            {/* REGISTER USER */}
             <Link
               href="/admin/register-user"
               className={clsx(
@@ -76,16 +94,9 @@ export default function Sidebar() {
             >
               Register User
             </Link>
-          )}
-        </nav>
-      </div>
-
-      <button
-        onClick={handleLogout}
-        className="mt-6 text-red-600 px-4 py-2 rounded-md hover:bg-red-100 transition text-left"
-      >
-        Logout
-      </button>
+          </>
+        )}
+      </nav>
     </aside>
   );
 }
