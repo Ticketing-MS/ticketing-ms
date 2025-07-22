@@ -3,10 +3,21 @@ import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
   try {
-     const { email, password } = await req.json();
+    const { email, password } = await req.json();
     const cleanEmail = email.trim().toLowerCase();
 
-    const user = await loginUser(cleanEmail, password);
+    let user;
+    try {
+      user = await loginUser(cleanEmail, password);
+    } catch (err: any) {
+      if (err.message === "disabled") {
+        return new Response(
+          JSON.stringify({ message: "Your account has been disabled" }),
+          { status: 403 }
+        );
+      }
+      throw err;
+    }
 
     if (!user) {
       return new Response(
@@ -15,30 +26,20 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!user.isActive) {
-      return new Response(
-        JSON.stringify({ message: "Your account has been disabled" }),
-        { status: 403 }
-      );
-    }
-
-    // Set cookie user
-    (await
-      // Set cookie user
-      cookies()).set(
+    (await cookies()).set(
       "user",
       JSON.stringify({
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
-        isActive: user.isActive, 
+        isActive: user.isActive,
       }),
       {
-        httpOnly: false, 
+        httpOnly: false,
         path: "/",
         sameSite: "lax",
-        maxAge: 300, 
+        maxAge: 300,
       }
     );
 

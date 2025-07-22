@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { db } from "db"; // Sesuaikan dengan path DB kamu
-import { users } from "db/schema"; // Sesuaikan
+import { db } from "db"; 
+import { users } from "db/schema"; 
 import { eq } from "drizzle-orm";
 
 export async function GET() {

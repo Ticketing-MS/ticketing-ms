@@ -10,11 +10,14 @@ export async function loginUser(email: string, password: string) {
     .where(eq(users.email, email))
     .then(res => res[0]);
 
-  if (!user) return { error: "not_found" };
-  if (!user.isActive) return { error: "disabled" };
+  if (!user) return null;
 
   const isMatch = await compare(password, user.password);
-  if (!isMatch) return { error: "not_found" };
+  if (!isMatch) return null;
+
+  if (!user.isActive) {
+    throw new Error("disabled");
+  }
 
   return user;
 }
@@ -54,7 +57,7 @@ export async function registerUser({
       password: hashedPassword,
       role,
       access,
-      isActive: true, // default aktif
+      isActive: true, 
     })
     .returning();
 
