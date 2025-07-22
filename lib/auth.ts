@@ -1,7 +1,7 @@
-import { db } from 'db';
-import { eq } from 'drizzle-orm';
-import { users } from 'db/schema';
-import { compare, hash } from 'bcryptjs';
+import { db } from "db";
+import { users } from "db/schema";
+import { eq } from "drizzle-orm";
+import { compare, hash } from "bcryptjs";
 
 export async function loginUser(email: string, password: string) {
   const user = await db
@@ -10,14 +10,11 @@ export async function loginUser(email: string, password: string) {
     .where(eq(users.email, email))
     .then(res => res[0]);
 
-  console.log('User found:', user);
-
-  if (!user) return null;
+  if (!user) return { error: "not_found" };
+  if (!user.isActive) return { error: "disabled" };
 
   const isMatch = await compare(password, user.password);
-  console.log('Password match:', isMatch);
-
-  if (!isMatch) return null;
+  if (!isMatch) return { error: "not_found" };
 
   return user;
 }
@@ -37,7 +34,6 @@ export async function registerUser({
   role,
   access = [],
 }: RegisterInput) {
-  // Cek user sudah ada atau belum
   const existing = await db
     .select()
     .from(users)
@@ -58,6 +54,7 @@ export async function registerUser({
       password: hashedPassword,
       role,
       access,
+      isActive: true, // default aktif
     })
     .returning();
 

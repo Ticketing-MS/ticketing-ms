@@ -25,7 +25,6 @@ export default function LoginPage() {
     const data = await res.json();
     if (!res.ok) return setError(data.message);
 
-    // login/page.tsx
     localStorage.setItem("user", JSON.stringify(data));
 
     setTimeout(() => {
@@ -38,17 +37,17 @@ export default function LoginPage() {
 
       const redirectPath = roleRedirectMap[data.role] || "/admin";
       router.push(redirectPath);
-    }); // ⏱️ kasih delay sedikit
+    }); 
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+    <div className="min-h-screen bg-gray-100  py-6 flex flex-col justify-center sm:py-12">
       <div className="relative py-3 sm:max-w-xl sm:mx-auto">
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-sky-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
         <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
           <form onSubmit={handleSubmit} className="max-w-md mx-auto">
             <div>
-              <h1 className="text-2xl font-semibold mb-2">Login</h1>
+              <h1 className="text-2xl font-semibold mb-2 text-gray-900">Login</h1>
               {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
             </div>
 
