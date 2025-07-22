@@ -9,7 +9,7 @@ export default function RegisterUserPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("cloud");
+  const [role, setRole] = useState("");
   const [access, setAccess] = useState<string[]>([]);
   const [message, setMessage] = useState("");
 
