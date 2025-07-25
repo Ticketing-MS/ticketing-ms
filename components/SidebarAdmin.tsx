@@ -5,99 +5,132 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 
-export default function SidebarAdmin() {
+interface SidebarProps {
+  onToggleWidth?: (collapsed: boolean) => void;
+}
+
+export default function SidebarAdmin({ onToggleWidth }: SidebarProps) {
   const pathname = usePathname();
   const [user, setUser] = useState<{ role: string; access?: string[] } | null>(
     null
   );
+  const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
     const raw = localStorage.getItem("user");
     if (raw) setUser(JSON.parse(raw));
   }, []);
 
-  const mainMenu = [
-    { name: "Dashboard", href: "/admin", role: "admin" },
-    { name: "Semua Tiket", href: "/admin/tiket", role: "admin" },
-    { name: "Cloud", href: "/admin/cloud", role: "cloud" },
-    { name: "DevOps", href: "/admin/devops", role: "devops" },
-    { name: "Project Manager", href: "/admin/pm", role: "pm" },
-  ];
+  const toggleSidebar = () => {
+    const newState = !isOpen;
+    setIsOpen(newState);
+    onToggleWidth?.(!newState); // true = collapsed
+  };
 
-  const adminOnlyMenu = [
-    { name: "Statistik & Laporan", href: "/admin/statistik", role: "admin" },
-    { name: "Pengaturan Sistem", href: "/admin/pengaturan", role: "admin" },
-  ];
+  const roleBasedMenus: Record<string, { name: string; href: string }[]> = {
+    admin: [
+      { name: "Dashboard", href: "/admin" },
+      { name: "Semua Tiket", href: "/admin/tiket" },
+      { name: "Cloud", href: "/admin/cloud" },
+      { name: "DevOps", href: "/admin/devops" },
+      { name: "Project Manager", href: "/admin/pm" },
+      { name: "Statistik & Laporan", href: "/admin/statistik" },
+      { name: "Management User", href: "/admin/management-user" },
+      { name: "Register User", href: "/admin/register-user" },
+    ],
+    cloud: [
+      { name: "Dashboard Cloud", href: "/cloud" },
+      { name: "My Tickets", href: "/cloud/tiket" },
+    ],
+    devops: [
+      { name: "Dashboard DevOps", href: "/devops" },
+      { name: "My Tickets", href: "/devops/tiket" },
+    ],
+    pm: [
+      { name: "Dashboard PM", href: "/pm" },
+      { name: "Overview", href: "/pm/overview" },
+    ],
+  };
 
   if (!user) return null;
 
+  const combinedMenus = [
+    ...(roleBasedMenus[user.role] || []),
+    ...(user.access?.flatMap((r) => roleBasedMenus[r] || []) || []),
+  ].filter(
+    (menu, index, self) => self.findIndex((m) => m.href === menu.href) === index
+  );
+
+  const roleTitleMap: Record<string, string> = {
+    admin: "Admin Panel",
+    cloud: "Cloud Panel",
+    devops: "DevOps Panel",
+    pm: "PM Panel",
+  };
+
   return (
-    <aside className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg p-4 z-50">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-800">Admin Panel</h2>
+    <aside
+      className={clsx(
+        "bg-white shadow-lg border-r transition-all duration-300",
+        "fixed top-0 left-0 z-40",
+        "min-h-screen h-full md:h-screen",
+        isOpen ? "w-64" : "w-16"
+      )}
+    >
+      <div className="flex items-center justify-between p-4 text-gray-500">
+        {isOpen && (
+          <h2 className="text-lg font-bold text-gray-800 truncate">
+            {roleTitleMap[user.role] ?? "Dashboard"}
+          </h2>
+        )}
+        <button
+          onClick={toggleSidebar}
+          className="p-2 rounded hover:bg-gray-100"
+        >
+          <svg viewBox="0 0 512 512" className="w-5 h-5 fill-current">
+            <path d="M400 144H112a16 16 0 0 1 0-32h288a16 16 0 0 1 0 32zm0 112H112a16 16 0 0 1 0-32h288a16 16 0 0 1 0 32zm0 112H112a16 16 0 0 1 0-32h288a16 16 0 0 1 0 32z" />
+          </svg>
+        </button>
       </div>
 
-      <nav className="flex flex-col gap-2">
-        {/* MAIN MENU */}
-        {mainMenu
-          .filter(
-            (item) =>
-              user.role === "admin" ||
-              item.role === user.role ||
-              (user.role === "pm" && user.access?.includes(item.role))
-          )
-          .map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={clsx(
-                "text-base px-4 py-2 rounded-md hover:bg-blue-100 transition",
-                pathname === item.href
-                  ? "bg-blue-500 text-white"
-                  : "text-gray-700"
+      <nav className="flex flex-col gap-1 px-2">
+        {combinedMenus.map((item, index) => {
+          const isAdminExtra =
+            user.role === "admin" &&
+            (item.name === "Statistik & Laporan" ||
+              item.name === "Management User" ||
+              item.name === "Register User");
+
+          const isFirstAdminExtra =
+            isAdminExtra &&
+            combinedMenus.findIndex((i) => i.name === "Statistik & Laporan") ===
+              index;
+
+          return (
+            <div key={item.href}>
+              {isFirstAdminExtra && isOpen && (
+                <>
+                  <hr className="my-2 border-gray-300" />
+                  <p className="text-xs text-gray-500 px-4 mb-1">
+                    Admin Section
+                  </p>
+                </>
               )}
-            >
-              {item.name}
-            </Link>
-          ))}
-
-        <div className="my-4 border-t border-gray-300"></div>
-
-        {user.role === "admin" && (
-          <>
-            <div className="mb-2 text-sm text-gray-500 font-semibold uppercase tracking-wide">
-              Lainnya
-            </div>
-
-            {adminOnlyMenu.map((item) => (
               <Link
-                key={item.href}
                 href={item.href}
                 className={clsx(
-                  "text-base px-4 py-2 rounded-md hover:bg-blue-100 transition",
+                  "flex items-center gap-2 px-4 py-2 rounded-md text-sm transition",
                   pathname === item.href
                     ? "bg-blue-500 text-white"
-                    : "text-gray-700"
+                    : "text-gray-700 hover:bg-blue-100",
+                  !isOpen && "justify-center"
                 )}
               >
-                {item.name}
+                {isOpen ? item.name : item.name.charAt(0)}
               </Link>
-            ))}
-
-            {/* REGISTER USER */}
-            <Link
-              href="/admin/register-user"
-              className={clsx(
-                "text-base px-4 py-2 rounded-md hover:bg-blue-100 transition",
-                pathname === "/admin/register-user"
-                  ? "bg-blue-500 text-white"
-                  : "text-gray-700"
-              )}
-            >
-              Register User
-            </Link>
-          </>
-        )}
+            </div>
+          );
+        })}
       </nav>
     </aside>
   );

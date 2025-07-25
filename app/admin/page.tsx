@@ -1,13 +1,25 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import SidebarAdmin from "components/SidebarAdmin";
-import Navbar from "components/Navbar";
+import { useEffect, useState } from "react";
 import AdminUserTable from "components/AdminUserTable.tsx";
+
+const roleLabelMap: Record<string, string> = {
+  admin: "Admin",
+  cloud: "Cloud",
+  devops: "DevOps",
+  pm: "Project Manager",
+};
 
 export default function AdminDashboard() {
   const router = useRouter();
+
+  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+
+  useEffect(() => {
+    const raw = localStorage.getItem("user");
+    if (raw) setUser(JSON.parse(raw));
+  }, []);
 
   useEffect(() => {
     const rawUser = localStorage.getItem("user");
@@ -19,13 +31,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex overflow-y-auto">
-      <SidebarAdmin />
-
-      <main className="ml-64 w-full min-h-screen bg-gray-100 min-h-screen p-6">
-        <Navbar />
-
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+      <main className="w-full min-h-screen bg-gray-100 p-6">
+        <h1 className="text-2xl font-bold mb-4 text-gray-700">
+          {user
+            ? `Welcome ${user.name} di tim ${roleLabelMap[user.role]}`
+            : "Loading..."}
         </h1>
+        <p className="text-gray-600 mb-6">Selamat datang di panel admin! 🛠️</p>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-white shadow p-4 rounded-lg text-gray-700">
             Tiket Active Cloud

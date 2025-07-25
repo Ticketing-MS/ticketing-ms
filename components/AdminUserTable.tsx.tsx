@@ -79,65 +79,45 @@ export default function AdminUserTable() {
   };
 
   return (
-    <div className="bg-white rounded shadow p-4 overflow-x-auto">
-      <h2 className="text-xl font-semibold mb-4">Manajemen User</h2>
-      <table className="min-w-[600px] w-full text-sm text-left">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-2">Nama</th>
-            <th className="p-2">Email</th>
-            <th className="p-2">Role</th>
-            <th className="p-2">Status</th>
-            <th className="p-2">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id} className="border-t">
-              <td className="p-2">{user.name}</td>
-              <td className="p-2">{user.email}</td>
-              <td className="p-2">
-                <select
-                  disabled={loadingId === user.id}
-                  value={user.role}
-                  onChange={(e) =>
-                    updateUserRole(user.id, e.target.value)
-                  }
-                  className="bg-white border border-gray-300 rounded px-2 py-1"
-                >
-                  {ROLES.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td className="p-2">
-                {user.isActive ? (
-                  <span className="text-green-600">Aktif</span>
-                ) : (
-                  <span className="text-red-600">Nonaktif</span>
-                )}
-              </td>
-              <td className="p-2">
-                <button
-                  disabled={loadingId === user.id}
-                  onClick={() =>
-                    toggleUserStatus(user.id, user.isActive)
-                  }
-                  className={`px-2 py-1 text-xs rounded ${
-                    user.isActive
-                      ? "bg-red-500 text-white"
-                      : "bg-green-500 text-white"
-                  }`}
-                >
-                  {user.isActive ? "Nonaktifkan" : "Aktifkan"}
-                </button>
-              </td>
+    <div className="container mx-auto px-4 sm:px-8 py-8">
+      <h2 className="text-2xl font-semibold text-gray-600 mb-6">
+        Manajemen User
+      </h2>
+      <div className="overflow-x-auto bg-white rounded shadow">
+        <table className="min-w-full leading-normal">
+          <thead>
+            <tr>
+              <th className="px-5 py-3 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Nama
+              </th>
+
+              <th className="px-5 py-3 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Status
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id} className="border-b">
+                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500 ">
+                  {user.name}
+                </td>
+                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500 ">
+                  <span
+                    className={`inline-block px-3 py-1 text-sm font-semibold rounded-full ${
+                      user.isActive
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {user.isActive ? "Aktif" : "Nonaktif"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

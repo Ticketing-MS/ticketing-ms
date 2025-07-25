@@ -4,138 +4,155 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
     const res = await fetch("/api/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
+
     const data = await res.json();
     if (!res.ok) return setError(data.message);
 
     localStorage.setItem("user", JSON.stringify(data));
 
-    setTimeout(() => {
-      const roleRedirectMap: Record<string, string> = {
-        admin: "/admin",
-        cloud: "/cloud",
-        devops: "/devops",
-        pm: "/pm",
-      };
-
-      const redirectPath = roleRedirectMap[data.role] || "/admin";
-      router.push(redirectPath);
-    }); 
+    const roleRedirectMap: Record<string, string> = {
+      admin: "/admin",
+      cloud: "/cloud",
+      devops: "/devops",
+      pm: "/pm",
+    };
+    const redirectPath = roleRedirectMap[data.role] || "/admin";
+    router.push(redirectPath);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100  py-6 flex flex-col justify-center sm:py-12">
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-sky-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-        <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
-          <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-            <div>
-              <h1 className="text-2xl font-semibold mb-2 text-gray-900">Login</h1>
-              {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-            </div>
+    <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center items-center">
+      <div className="max-w-screen-xl bg-white shadow sm:rounded-lg flex w-full sm:m-10">
+        {/* Form */}
+        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
+          <div className="mt-12 flex flex-col items-center">
+            <h1 className="text-2xl xl:text-3xl font-extrabold">Sign in</h1>
+            <form onSubmit={handleSubmit} className="w-full mt-8 space-y-4">
+              {error && (
+                <p className="text-red-500 text-sm text-center">{error}</p>
+              )}
+              <input
+                type="email"
+                placeholder="Email"
+                className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="submit"
+                className="w-full py-3 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-600 transition duration-300 flex items-center justify-center"
+              >
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="8.5" cy="7" r="4" />
+                  <path d="M20 8v6M23 11h-6" />
+                </svg>
+                Sign In
+              </button>
+            </form>
 
-            <div className="divide-y divide-gray-200">
-              <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                <div className="relative">
-                  <input
-                    autoComplete="off"
-                    id="email"
-                    name="email"
-                    type="email"
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-rose-600"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                  <label
-                    htmlFor="email"
-                    className="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all
-                      peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
-                      peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600
-                      peer-focus:text-sm"
-                  >
-                    Email Address
-                  </label>
-                </div>
-
-                <div className="relative">
-                  <input
-                    autoComplete="off"
-                    id="password"
-                    name="password"
-                    type="password"
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-rose-600"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <label
-                    htmlFor="password"
-                    className="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all
-                      peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
-                      peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600
-                      peer-focus:text-sm"
-                  >
-                    Password
-                  </label>
-                </div>
-
-                <div className="relative">
-                  <button
-                    type="submit"
-                    className="bg-cyan-500 text-white rounded-md px-4 py-2 mt-4 w-full hover:bg-cyan-600 transition"
-                  >
-                    Submit
-                  </button>
-                </div>
+            <div className="my-6 border-b text-center w-full">
+              <div className="leading-none px-2 inline-block text-sm text-gray-600 bg-white transform translate-y-1/2">
+                Or sign in with
               </div>
             </div>
-          </form>
 
-          <div className="w-full flex justify-center mt-6">
-            <button className="flex items-center bg-white border border-gray-300 rounded-lg shadow-md px-6 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-              <svg
-                className="h-6 w-6 mr-2"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="-0.5 0 48 48"
+            <div className="flex flex-col gap-4 w-full">
+              <button
+                type="button"
+                className="flex items-center justify-center px-4 py-3 border rounded-lg text-sm bg-indigo-100 text-gray-800 hover:shadow"
               >
-                <path
-                  fill="#FBBC05"
-                  d="M9.827 24c0-1.524.253-2.986.705-4.356L2.623 13.604C1.082 16.734.214 20.26.214 24c0 3.737.867 7.262 2.407 10.389l7.904-6.051A14.17 14.17 0 0 1 9.827 24z"
-                />
-                <path
-                  fill="#EB4335"
-                  d="M23.714 10.133c3.311 0 6.302 1.173 8.652 3.093l6.836-6.827C35.036 2.773 29.695.533 23.714.533 14.427.533 6.445 5.844 2.623 13.604l7.909 6.04c1.823-5.532 7.017-9.511 13.182-9.511z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M23.714 37.867c-6.165 0-11.36-3.978-13.182-9.51l-7.909 6.039c3.822 7.761 11.804 13.072 21.091 13.072 5.732 0 11.205-2.035 15.312-5.848l-7.507-5.804a13.965 13.965 0 0 1-8.805 2.051z"
-                />
-                <path
-                  fill="#4285F4"
-                  d="M46.145 24c0-1.387-.214-2.88-.534-4.267H23.714v9.067H36.318c-.63 3.091-2.346 5.468-4.8 7.015l7.507 5.804C43.34 37.614 46.145 31.649 46.145 24z"
-                />
-              </svg>
-              <span>Continue with Google</span>
-            </button>
+                <svg
+                  className="w-5 h-5 mr-3"
+                  viewBox="0 0 533.5 544.3"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z"
+                    fill="#4285f4"
+                  />
+                  <path
+                    d="M272.1 544.3c73.4 0 135.3-24.1 180.4-65.7l-87.7-68c-24.4 16.6-55.9 26-92.6 26-71 0-131.2-47.9-152.8-112.3H28.9v70.1C75.1 486.3 169.2 544.3 272.1 544.3z"
+                    fill="#34a853"
+                  />
+                  <path
+                    d="M119.3 324.3c-11.4-33.8-11.4-70.4 0-104.2V150H28.9c-38.6 76.9-38.6 167.5 0 244.4l90.4-70.1z"
+                    fill="#fbbc04"
+                  />
+                  <path
+                    d="M272.1 107.7c38.8-.6 76.3 14 104.4 40.8l77.7-77.7C405 24.6 339.7-.8 272.1 0 169.2 0 75.1 58 28.9 150l90.4 70.1c21.5-64.5 81.8-112.4 152.8-112.4z"
+                    fill="#ea4335"
+                  />
+                </svg>
+                Sign in with Google
+              </button>
+
+              <button
+                type="button"
+                className="flex items-center justify-center px-4 py-3 border rounded-lg text-sm bg-indigo-100 text-gray-800 hover:shadow"
+              >
+                <svg className="w-5 h-5 mr-3" viewBox="0 0 32 32">
+                  <path
+                    fillRule="evenodd"
+                    d="M16 4C9.371 4 4 9.371 4 16c0 5.3 3.438 9.8 8.207 11.387.602.11.82-.258.82-.578 0-.286-.011-1.04-.015-2.04-3.34.723-4.043-1.609-4.043-1.609-.547-1.387-1.332-1.758-1.332-1.758-1.09-.742.082-.726.082-.726 1.203.086 1.836 1.234 1.836 1.234 1.07 1.836 2.808 1.305 3.492 1 .11-.777.422-1.305.762-1.605-2.664-.301-5.465-1.332-5.465-5.93 0-1.313.469-2.383 1.234-3.223-.121-.3-.535-1.523.117-3.175 0 0 1.008-.32 3.301 1.23A11.487 11.487 0 0116 9.805c1.02.004 2.047.136 3.004.402 2.293-1.55 3.297-1.23 3.297-1.23.656 1.652.246 2.875.12 3.175.77.84 1.231 1.91 1.231 3.223 0 4.61-2.804 5.621-5.476 5.922.43.367.812 1.101.812 2.219 0 1.605-.011 2.898-.011 3.293 0 .32.214.695.824.578C24.566 25.797 28 21.3 28 16c0-6.629-5.371-12-12-12z"
+                  />
+                </svg>
+                Sign in with GitHub
+              </button>
+            </div>
+
+            <p className="mt-6 text-xs text-gray-600 text-center">
+              I agree to abide by Templatana's{" "}
+              <a href="#" className="border-b border-gray-500">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="#" className="border-b border-gray-500">
+                Privacy Policy
+              </a>
+            </p>
           </div>
+        </div>
+
+        {/* Right image */}
+        <div className="flex-1 bg-indigo-100 text-center hidden lg:flex">
+          <div
+            className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
+            style={{
+              backgroundImage:
+                "url('https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg')",
+            }}
+          />
         </div>
       </div>
     </div>

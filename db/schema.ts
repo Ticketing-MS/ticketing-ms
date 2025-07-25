@@ -18,7 +18,8 @@ export const users = pgTable('users', {
   role: text('role').default('user').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   isActive: boolean("is_active").default(true),
-  access: text('access').array().default([]),
+  team: text('team').array().default([]),
+  avatarUrl: text('avatar_url'),
 });
 
 // --- Categories

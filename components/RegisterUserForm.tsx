@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-export default function RegisterUserPage() {
+export default function RegisterUserForm() {
   const router = useRouter();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("admin");
   const [access, setAccess] = useState<string[]>([]);
   const [message, setMessage] = useState("");
 
@@ -21,6 +22,7 @@ export default function RegisterUserPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password, role, access }),
     });
+    toast.success(`Success Create Users`);
 
     const data = await res.json();
     if (!res.ok) {
@@ -39,128 +41,103 @@ export default function RegisterUserPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-sky-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
-        <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
-          <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-            <div>
-              <h1 className="text-2xl font-semibold mb-2 text-gray-900">
-                Register User Baru
-              </h1>
-              {message && (
-                <p className="text-red-500 text-sm mb-4">{message}</p>
-              )}
+    <div className="w-full px-4 py-6">
+      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-md p-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Register User Baru
+        </h1>
+
+        {message && (
+          <div className="text-sm text-red-600 text-center mb-4">{message}</div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Name */}
+          <div>
+            <label className="block mb-1 text-sm text-gray-600">Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              placeholder="Masukkan nama"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block mb-1 text-sm text-gray-600">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              placeholder="Masukkan email"
+            />
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block mb-1 text-sm text-gray-600">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+              placeholder="Masukkan password"
+            />
+          </div>
+
+          {/* Role */}
+          <div>
+            <label className="block mb-1 text-sm text-gray-600">Role</label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 text-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            >
+              <option value="admin">Admin</option>
+              <option value="cloud">Cloud</option>
+              <option value="devops">DevOps</option>
+              <option value="pm">Project Manager</option>
+            </select>
+          </div>
+
+          {/* Access for PM */}
+          {role === "pm" && (
+            <div className="flex gap-4">
+              <label className="flex items-center text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={access.includes("cloud")}
+                  onChange={() => toggleAccess("cloud")}
+                  className="mr-2"
+                />
+                Cloud
+              </label>
+              <label className="flex items-center text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={access.includes("devops")}
+                  onChange={() => toggleAccess("devops")}
+                  className="mr-2"
+                />
+                DevOps
+              </label>
             </div>
+          )}
 
-            <div className="divide-y divide-gray-200">
-              <div className="py-8 space-y-4 text-gray-700 sm:text-base">
-                {/* Name */}
-                <div className="relative">
-                  <input
-                    id="name"
-                    type="text"
-                    placeholder="Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-sky-600"
-                  />
-                  <label
-                    htmlFor="name"
-                    className="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all
-                      peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400
-                      peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600
-                      peer-focus:text-sm"
-                  >
-                    Name
-                  </label>
-                </div>
-
-                {/* Email */}
-                <div className="relative">
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-sky-600"
-                  />
-                  <label htmlFor="email" className="floating-label">
-                    Email
-                  </label>
-                </div>
-
-                {/* Password */}
-                <div className="relative">
-                  <input
-                    id="password"
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-sky-600"
-                  />
-                  <label htmlFor="password" className="floating-label">
-                    Password
-                  </label>
-                </div>
-
-                {/* Role */}
-                <div className="relative">
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    className="w-full border-b-2 border-gray-300 bg-transparent text-gray-900 focus:outline-none focus:border-sky-600"
-                  >
-                    <option value="admin">Admin</option>
-                    <option value="cloud">Cloud</option>
-                    <option value="devops">DevOps</option>
-                    <option value="pm">Project Manager</option>
-                  </select>
-                  <label className="text-sm text-gray-500">Role</label>
-                </div>
-
-                {/* Access Checkbox */}
-                {role === "pm" && (
-                  <div className="flex gap-4 pt-2">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={access.includes("cloud")}
-                        onChange={() => toggleAccess("cloud")}
-                        className="mr-2"
-                      />
-                      Cloud
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={access.includes("devops")}
-                        onChange={() => toggleAccess("devops")}
-                        className="mr-2"
-                      />
-                      DevOps
-                    </label>
-                  </div>
-                )}
-
-                {/* Submit */}
-                <div className="relative">
-                  <button
-                    type="submit"
-                    className="bg-cyan-500 text-white rounded-md px-4 py-2 mt-4 w-full hover:bg-cyan-600 transition"
-                  >
-                    Register
-                  </button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
+          {/* Submit */}
+          <button
+            type="submit"
+            className="w-full bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded-md transition"
+          >
+            Register
+          </button>
+        </form>
       </div>
     </div>
   );
