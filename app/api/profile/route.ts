@@ -1,6 +1,6 @@
 import { getCurrentUser, updateProfile } from "lib/auth";
 
-export async function POST(req: Request) {
+export async function PUT(req: Request) {
   try {
     const body = await req.json();
     const { name, email } = body;
@@ -11,21 +11,20 @@ export async function POST(req: Request) {
     }
 
     const result = await updateProfile(currentUser.id, { name, email });
+
     return new Response(JSON.stringify({ success: true, user: result }), {
-      status: 201,
+      status: 200,
       headers: {
         "Content-Type": "application/json",
       },
     });
   } catch (error) {
-    console.error("Register error:", error);
+    console.error("Update error:", error);
     return new Response(
       JSON.stringify({ message: "Failed to update user" }),
       {
         status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       }
     );
   }

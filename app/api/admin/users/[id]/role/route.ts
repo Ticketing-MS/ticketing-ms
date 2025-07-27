@@ -20,6 +20,7 @@ export async function PATCH(
       return NextResponse.json({ message: "Invalid role" }, { status: 400 });
     }
 
+    // Eksekusi update
     const updatedUser = await db
       .update(users)
       .set({ role })

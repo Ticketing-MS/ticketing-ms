@@ -15,8 +15,7 @@ export async function loginUser(email: string, password: string) {
   if (!user || !(await compare(password, user.password))) return null;
   if (!user.isActive) throw new Error("disabled");
 
-  // simpan UUID sebagai string
-  (await cookies()).set("user_id", user.id); 
+  (await cookies()).set("user_id", user.id);
   return user;
 }
 
@@ -28,11 +27,11 @@ export async function getCurrentUser() {
   return db
     .select()
     .from(users)
-    .where(eq(users.id, userId)) // langsung pakai string UUID
+    .where(eq(users.id, userId))
     .then((res) => res[0]);
 }
 
-// Fungsi Register
+// Register
 type RegisterInput = {
   name: string;
   email: string;
@@ -65,7 +64,7 @@ export async function registerUser({ name, email, password, role }: RegisterInpu
   return newUser;
 }
 
-// Update user
+// Update profile
 export async function updateProfile(userId: string, data: { name?: string; email?: string }) {
   const [updateUser] = await db
     .update(users)
@@ -73,7 +72,7 @@ export async function updateProfile(userId: string, data: { name?: string; email
       name: data.name,
       email: data.email,
     })
-    .where(eq(users.id, userId)) // pakai string UUID
+    .where(eq(users.id, userId))
     .returning();
 
   return updateUser;

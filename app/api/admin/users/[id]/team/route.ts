@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 
 export async function PATCH(req: NextRequest, context: any) {
   const { params } = await Promise.resolve(context); // trick untuk hilangkan warning
-  const userId = Number(params.id);
+  const userId = params.id;
 
   const { team } = await req.json();
 

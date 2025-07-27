@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 
@@ -8,15 +9,38 @@ export default function Navbar() {
   const router = useRouter();
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     router.push("/login");
   };
 
-  const handleProfile = () => {
-    router.push("/profile");
-  };
+  function getInitials(name: string): string {
+    const words = name.trim().split(" ");
+    if (words.length === 1) return words[0][0]?.toUpperCase() ?? "";
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+
+  function getRoleLabel(role: string): string {
+    const roles: Record<string, string> = {
+      admin: "Admin",
+      cloud: "Cloud",
+      devops: "DevOps",
+      pm: "Project Manager",
+    };
+    return roles[role] || role;
+  }
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setUserName(user.name || "");
+      setUserRole(user.role || "");
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -60,19 +84,22 @@ export default function Navbar() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setOpenDropdown(!openDropdown)}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none transition-all duration-300"
+          className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold hover:bg-blue-600 focus:outline-none transition-all duration-300"
         >
-          Akun
+          {getInitials(userName || "U")}
         </button>
 
         {openDropdown && (
-          <div className="absolute right-0 mt-2 w-44 bg-white border rounded-md shadow-lg animate-fade-in z-50">
-            <button
-              onClick={handleProfile}
-              className="w-full text-left px-4 py-2 hover:bg-blue-100 text-gray-800 hover:text-blue-700 focus:bg-blue-100 focus:text-blue-700 transition-all duration-200"
-            >
-              👤 Profile
-            </button>
+          <div className="absolute right-0 mt-2 w-56 bg-white border rounded-md shadow-lg animate-fade-in z-50">
+            <Link href="/profile">
+              <div className="px-4 py-3 border-b">
+                <p className="text-gray-800 font-semibold">{userName}</p>
+
+                <p className="text-gray-500 text-sm">
+                  {getRoleLabel(userRole || "")}
+                </p>
+              </div>
+            </Link>
             <button
               onClick={handleLogout}
               className="w-full text-left px-4 py-2 hover:bg-red-100 text-gray-800 hover:text-red-600 focus:bg-red-100 focus:text-red-600 transition-all duration-200"

@@ -9,22 +9,10 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  try {
-    const { id, isActive } = await req.json();
-
-    const numericId = Number(id);
-    if (isNaN(numericId)) {
-      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
-    }
-
-    await db
-      .update(users)
-      .set({ isActive }) 
-      .where(eq(users.id, numericId));
-
-    return NextResponse.json({ message: "User updated" });
-  } catch (error) {
-    console.error("Error updating user:", error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
-  }
+  const { id, isActive } = await req.json();
+  await db
+    .update(users)
+    .set({ isActive }) 
+    .where(eq(users.id, id));
+  return NextResponse.json({ message: "User updated" });
 }
