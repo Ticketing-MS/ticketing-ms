@@ -3,11 +3,13 @@ import { users } from "db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-export async function PATCH(request: Request, context: { params: { id: string } }) {
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const { role } = await request.json();
-    const { id } = await context.params; 
-    const userId = Number(id);
+    const userId = Number(params.id);
 
     if (isNaN(userId)) {
       return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });

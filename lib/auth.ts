@@ -4,8 +4,6 @@ import { eq } from "drizzle-orm";
 import { compare, hash } from "bcryptjs";
 import { cookies } from "next/headers";
 
-
-
 // Fungsi Login
 export async function loginUser(email: string, password: string) {
   const user = await db.select().from(users).where(eq(users.email, email)).then(res => res[0]);
@@ -28,29 +26,36 @@ type RegisterInput = {
   email: string;
   password: string;
   role: string;
-  access?: string[];
 };
 
 // Register Users
-export async function registerUser({ name, email, password, role, access = [] }: RegisterInput) {
+export async function registerUser({ name, email, password, role }: RegisterInput) {
   const existing = await db.select().from(users).where(eq(users.email, email)).then(res => res[0]);
   if (existing) throw new Error("User already exists");
+
   const hashedPassword = await hash(password, 10);
+
   const [newUser] = await db.insert(users).values({
-    name, email, password: hashedPassword, role, access, isActive: true
+    name,
+    email,
+    password: hashedPassword,
+    role,
+    isActive: true
   }).returning();
+
   return newUser;
 }
 
 // Update user
 export async function updateProfile(userId: number, data: { name?: string; email?: string }) {
-const [updateUser] = await db
-  .update(users)
-  .set({
-    name: data.name,
-    email: data.email
-  })
-  .where(eq(users.id, userId))
-  .returning();
+  const [updateUser] = await db
+    .update(users)
+    .set({
+      name: data.name,
+      email: data.email
+    })
+    .where(eq(users.id, userId))
+    .returning();
+
   return updateUser;
 }
