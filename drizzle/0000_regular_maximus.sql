@@ -1,53 +1,56 @@
-CREATE TYPE "public"."role" AS ENUM('admin', 'cloud', 'devops', 'pm');--> statement-breakpoint
 CREATE TABLE "attachments" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"ticket_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"ticket_id" uuid NOT NULL,
 	"file_url" text NOT NULL,
 	"uploaded_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "categories" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(100) NOT NULL,
 	CONSTRAINT "categories_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE "priorities" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"level" varchar(20) NOT NULL,
 	CONSTRAINT "priorities_level_unique" UNIQUE("level")
 );
 --> statement-breakpoint
 CREATE TABLE "ticket_replies" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"ticket_id" integer NOT NULL,
-	"user_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"ticket_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL,
 	"message" text NOT NULL,
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "tickets" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" varchar(200) NOT NULL,
 	"description" text NOT NULL,
 	"status" text DEFAULT 'open' NOT NULL,
-	"user_id" integer NOT NULL,
-	"category_id" integer,
-	"priority_id" integer,
-	"assigned_to" integer,
+	"user_id" uuid NOT NULL,
+	"category_id" uuid,
+	"priority_id" uuid,
+	"assigned_to" uuid,
 	"reference_code" varchar(20) NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
+	"team" text DEFAULT 'cloud' NOT NULL,
 	CONSTRAINT "tickets_reference_code_unique" UNIQUE("reference_code")
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" text NOT NULL,
-	"email" text NOT NULL,
-	"password" text NOT NULL,
-	"role" "role" DEFAULT 'cloud' NOT NULL,
+	"name" varchar(100) NOT NULL,
+	"email" varchar(100) NOT NULL,
+	"password" varchar(255) NOT NULL,
+	"role" text DEFAULT 'user' NOT NULL,
 	"created_at" timestamp DEFAULT now(),
+	"is_active" boolean DEFAULT true,
+	"team" text[] DEFAULT '{}',
+	"avatar_url" text,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint

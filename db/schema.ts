@@ -1,16 +1,16 @@
 import {
   boolean,
   pgTable,
-  serial,
   text,
   timestamp,
   varchar,
-  integer,
+  uuid,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 // --- Users
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 100 }).notNull(),
   email: varchar("email", { length: 100 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
@@ -23,43 +23,47 @@ export const users = pgTable("users", {
 
 // --- Categories
 export const categories = pgTable("categories", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 100 }).notNull().unique(),
 });
 
 // --- Priorities
 export const priorities = pgTable("priorities", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   level: varchar("level", { length: 20 }).notNull().unique(), // e.g., low | medium | high
 });
 
 // --- Tickets
-export const tickets = pgTable('tickets', {
-  id: serial('id').primaryKey(),
-  title: varchar('title', { length: 200 }).notNull(),
-  description: text('description').notNull(),
-  status: text('status').default('open').notNull(), // 'open' | 'in_progress' | 'closed'
-  userId: integer('user_id')
+export const tickets = pgTable("tickets", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description").notNull(),
+  status: text("status").default("open").notNull(), // 'open' | 'in_progress' | 'closed'
+  userId: uuid("user_id")
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  categoryId: integer('category_id').references(() => categories.id, { onDelete: 'set null' }),
-  priorityId: integer('priority_id').references(() => priorities.id, { onDelete: 'set null' }),
-  assignedTo: integer('assigned_to').references(() => users.id, { onDelete: 'set null' }),
-  referenceCode: varchar('reference_code', { length: 20 }).notNull().unique(),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(), // drizzle belum support ON UPDATE CURRENT_TIMESTAMP
-
-  // ✅ Tambahkan kolom team (misalnya: "cloud", "devops", dsb)
-  team: text('team').notNull().default('cloud'),
+    .references(() => users.id, { onDelete: "cascade" }),
+  categoryId: uuid("category_id").references(() => categories.id, {
+    onDelete: "set null",
+  }),
+  priorityId: uuid("priority_id").references(() => priorities.id, {
+    onDelete: "set null",
+  }),
+  assignedTo: uuid("assigned_to").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  referenceCode: varchar("reference_code", { length: 20 }).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  team: text("team").notNull().default("cloud"),
 });
 
 // --- Ticket Replies
 export const ticketReplies = pgTable("ticket_replies", {
-  id: serial("id").primaryKey(),
-  ticketId: integer("ticket_id")
+  id: uuid("id").primaryKey().defaultRandom(),
+  ticketId: uuid("ticket_id")
     .notNull()
     .references(() => tickets.id, { onDelete: "cascade" }),
-  userId: integer("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   message: text("message").notNull(),
@@ -68,8 +72,8 @@ export const ticketReplies = pgTable("ticket_replies", {
 
 // --- Attachments
 export const attachments = pgTable("attachments", {
-  id: serial("id").primaryKey(),
-  ticketId: integer("ticket_id")
+  id: uuid("id").primaryKey().defaultRandom(),
+  ticketId: uuid("ticket_id")
     .notNull()
     .references(() => tickets.id, { onDelete: "cascade" }),
   fileUrl: text("file_url").notNull(),
