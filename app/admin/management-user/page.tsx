@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type User = {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: string;
@@ -16,11 +16,9 @@ type User = {
 const ROLES = ["admin", "cloud", "devops", "pm"];
 
 export default function ManagementUserPage() {
-
   const [users, setUsers] = useState<User[]>([]);
-  const [loadingId, setLoadingId] = useState<number | null>(null);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  
 
   useEffect(() => {
     fetch("/api/admin/users")
@@ -29,7 +27,7 @@ export default function ManagementUserPage() {
       .catch(() => toast.error("Gagal memuat data user"));
   }, []);
 
-  const toggleUserStatus = async (id: number, current: boolean) => {
+  const toggleUserStatus = async (id: string, current: boolean) => {
     setLoadingId(id);
     try {
       const res = await fetch("/api/admin/users", {
@@ -57,7 +55,7 @@ export default function ManagementUserPage() {
     setLoadingId(null);
   };
 
-  const updateUserRole = async (id: number, newRole: string) => {
+  const updateUserRole = async (id: string, newRole: string) => {
     setLoadingId(id);
     try {
       const res = await fetch(`/api/admin/users/${id}/role`, {
@@ -83,7 +81,7 @@ export default function ManagementUserPage() {
     setLoadingId(null);
   };
 
-  const toggleTeam = async (id: number, selectedTeam: string) => {
+  const toggleTeam = async (id: string, selectedTeam: string) => {
     setLoadingId(id);
     try {
       const user = users.find((u) => u.id === id);
@@ -120,7 +118,6 @@ export default function ManagementUserPage() {
 
   return (
     <div className="container mx-auto px-4 sm:px-8 py-8">
-
       <div className="flex flex-col sm:flex-row justify-between mb-4">
         <div className="mb-2 sm:mb-0">
           <input
@@ -157,16 +154,17 @@ export default function ManagementUserPage() {
           <tbody>
             {filtered.map((user) => (
               <tr key={user.id} className="border-b">
-                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500 ">{user.name}</td>
-                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500 ">
+                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500">
+                  {user.name}
+                </td>
+                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500">
                   {user.email}
                 </td>
                 <td className="px-5 py-4 align-top">
                   <div className="flex flex-col gap-2">
-                    {/* Label untuk role */}
-                    <label className="block text-sm text-xs font-semibold text-gray-500">Role</label>
-
-                    {/* Select Role */}
+                    <label className="block text-sm text-xs font-semibold text-gray-500">
+                      Role
+                    </label>
                     <select
                       disabled={loadingId === user.id}
                       value={user.role}
@@ -180,7 +178,6 @@ export default function ManagementUserPage() {
                       ))}
                     </select>
 
-                    {/* Checkbox akses jika PM */}
                     {user.role === "pm" && (
                       <div className="mt-2 space-y-1">
                         <label className="flex items-center text-xs font-semibold text-gray-500">
@@ -216,7 +213,7 @@ export default function ManagementUserPage() {
                     {user.isActive ? "Aktif" : "Nonaktif"}
                   </span>
                 </td>
-                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500 ">
+                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500">
                   <button
                     disabled={loadingId === user.id}
                     onClick={() => toggleUserStatus(user.id, user.isActive)}

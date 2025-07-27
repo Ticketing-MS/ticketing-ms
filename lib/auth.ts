@@ -6,10 +6,17 @@ import { cookies } from "next/headers";
 
 // Fungsi Login
 export async function loginUser(email: string, password: string) {
-  const user = await db.select().from(users).where(eq(users.email, email)).then(res => res[0]);
-  if (!user || !await compare(password, user.password)) return null;
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .then((res) => res[0]);
+
+  if (!user || !(await compare(password, user.password))) return null;
   if (!user.isActive) throw new Error("disabled");
-  (await cookies()).set("user_id", user.id.toString());
+
+  // simpan UUID sebagai string
+  (await cookies()).set("user_id", user.id); 
   return user;
 }
 
@@ -17,7 +24,12 @@ export async function loginUser(email: string, password: string) {
 export async function getCurrentUser() {
   const userId = (await cookies()).get("user_id")?.value;
   if (!userId) return null;
-  return db.select().from(users).where(eq(users.id, Number(userId))).then(res => res[0]);
+
+  return db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId)) // langsung pakai string UUID
+    .then((res) => res[0]);
 }
 
 // Fungsi Register
@@ -28,33 +40,40 @@ type RegisterInput = {
   role: string;
 };
 
-// Register Users
 export async function registerUser({ name, email, password, role }: RegisterInput) {
-  const existing = await db.select().from(users).where(eq(users.email, email)).then(res => res[0]);
+  const existing = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .then((res) => res[0]);
+
   if (existing) throw new Error("User already exists");
 
   const hashedPassword = await hash(password, 10);
 
-  const [newUser] = await db.insert(users).values({
-    name,
-    email,
-    password: hashedPassword,
-    role,
-    isActive: true
-  }).returning();
+  const [newUser] = await db
+    .insert(users)
+    .values({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      isActive: true,
+    })
+    .returning();
 
   return newUser;
 }
 
 // Update user
-export async function updateProfile(userId: number, data: { name?: string; email?: string }) {
+export async function updateProfile(userId: string, data: { name?: string; email?: string }) {
   const [updateUser] = await db
     .update(users)
     .set({
       name: data.name,
-      email: data.email
+      email: data.email,
     })
-    .where(eq(users.id, userId))
+    .where(eq(users.id, userId)) // pakai string UUID
     .returning();
 
   return updateUser;

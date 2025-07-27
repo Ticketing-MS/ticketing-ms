@@ -9,20 +9,33 @@ export async function PATCH(
 ) {
   try {
     const { role } = await request.json();
-    const userId = Number(params.id);
 
-    if (isNaN(userId)) {
-      return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
-    }
+    const userId = params.id;
+    // if (isNaN(userId)) {
+    //   return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
 
-    if (!["admin", "cloud", "devops", "pm"].includes(role)) {
+    // Validasi role yang diizinkan
+    const validRoles = ["admin", "cloud", "devops", "pm"];
+    if (!validRoles.includes(role)) {
       return NextResponse.json({ message: "Invalid role" }, { status: 400 });
     }
 
-    await db.update(users).set({ role }).where(eq(users.id, userId));
-    return NextResponse.json({ message: "Role updated successfully" });
+    const updatedUser = await db
+      .update(users)
+      .set({ role })
+      .where(eq(users.id, userId))
+      .returning();
+
+    if (updatedUser.length === 0) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      message: "Role updated successfully",
+      user: updatedUser[0]
+    });
   } catch (error) {
-    console.error(error);
+    console.error("PATCH /users/[id]/role error:", error);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
