@@ -4,7 +4,7 @@ import { useState } from "react";
 import SidebarAdmin from "components/SidebarAdmin";
 import Navbar from "components/Navbar";
 
-export default function CloudLayout({
+export default function DevopsLayout({
   children,
 }: {
   children: React.ReactNode;
