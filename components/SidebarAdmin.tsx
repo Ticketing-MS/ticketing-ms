@@ -11,9 +11,7 @@ interface SidebarProps {
 
 export default function SidebarAdmin({ onToggleWidth }: SidebarProps) {
   const pathname = usePathname();
-  const [user, setUser] = useState<{ role: string; access?: string[] } | null>(
-    null
-  );
+  const [user, setUser] = useState<{ role: string; access?: string[] } | null>(null);
   const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
@@ -57,9 +55,7 @@ export default function SidebarAdmin({ onToggleWidth }: SidebarProps) {
   const combinedMenus = [
     ...(roleBasedMenus[user.role] || []),
     ...(user.access?.flatMap((r) => roleBasedMenus[r] || []) || []),
-  ].filter(
-    (menu, index, self) => self.findIndex((m) => m.href === menu.href) === index
-  );
+  ].filter((menu, index, self) => self.findIndex((m) => m.href === menu.href) === index);
 
   const roleTitleMap: Record<string, string> = {
     admin: "Admin Panel",
@@ -71,21 +67,21 @@ export default function SidebarAdmin({ onToggleWidth }: SidebarProps) {
   return (
     <aside
       className={clsx(
-        "bg-white shadow-lg border-r transition-all duration-300",
-        "fixed top-0 left-0 z-40",
-        "min-h-screen h-full md:h-screen",
+        "bg-white dark:bg-gray-900 shadow-lg border-r border-gray-200 dark:border-gray-800 transition-all duration-300",
+        "fixed top-0 left-0 z-40 min-h-screen h-full",
         isOpen ? "w-64" : "w-16"
       )}
     >
-      <div className="flex items-center justify-between p-4 text-gray-500">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 text-gray-500 dark:text-gray-300">
         {isOpen && (
-          <h2 className="text-lg font-bold text-gray-800 truncate">
-            {roleTitleMap[user.role] ?? "Dashboard"}
+          <h2 className="text-lg font-bold text-gray-800 dark:text-white truncate">
+            {/* {roleTitleMap[user.role] ?? "Dashboard"} */}
           </h2>
         )}
         <button
           onClick={toggleSidebar}
-          className="p-2 rounded hover:bg-gray-100"
+          className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           <svg viewBox="0 0 512 512" className="w-5 h-5 fill-current">
             <path d="M400 144H112a16 16 0 0 1 0-32h288a16 16 0 0 1 0 32zm0 112H112a16 16 0 0 1 0-32h288a16 16 0 0 1 0 32zm0 112H112a16 16 0 0 1 0-32h288a16 16 0 0 1 0 32z" />
@@ -93,6 +89,7 @@ export default function SidebarAdmin({ onToggleWidth }: SidebarProps) {
         </button>
       </div>
 
+      {/* Navigation */}
       <nav className="flex flex-col gap-1 px-2">
         {combinedMenus.map((item, index) => {
           const isAdminExtra =
@@ -103,15 +100,14 @@ export default function SidebarAdmin({ onToggleWidth }: SidebarProps) {
 
           const isFirstAdminExtra =
             isAdminExtra &&
-            combinedMenus.findIndex((i) => i.name === "Statistik & Laporan") ===
-              index;
+            combinedMenus.findIndex((i) => i.name === "Statistik & Laporan") === index;
 
           return (
             <div key={item.href}>
               {isFirstAdminExtra && isOpen && (
                 <>
-                  <hr className="my-2 border-gray-300" />
-                  <p className="text-xs text-gray-500 px-4 mb-1">
+                  <hr className="my-2 border-gray-300 dark:border-gray-600" />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 px-4 mb-1">
                     Admin Section
                   </p>
                 </>
@@ -122,7 +118,7 @@ export default function SidebarAdmin({ onToggleWidth }: SidebarProps) {
                   "flex items-center gap-2 px-4 py-2 rounded-md text-sm transition",
                   pathname === item.href
                     ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:bg-blue-100",
+                    : "text-gray-700 hover:bg-blue-100 dark:text-gray-300 dark:hover:bg-gray-700",
                   !isOpen && "justify-center"
                 )}
               >

@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import { useTheme } from "components/theme-provider";
+import { Sun, Moon } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -11,6 +13,7 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -78,36 +81,54 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50">
-      <h2 className="text-xl font-semibold text-gray-800">{getTitle()}</h2>
+    <nav className="bg-white dark:bg-gray-900 shadow px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+      <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+        {getTitle()}
+      </h2>
 
-      <div className="relative" ref={dropdownRef}>
+      <div className="flex items-center gap-3">
+        {/* Toggle Theme Button */}
         <button
-          onClick={() => setOpenDropdown(!openDropdown)}
-          className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold hover:bg-blue-600 focus:outline-none transition-all duration-300"
+          onClick={toggleTheme}
+          className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
         >
-          {getInitials(userName || "U")}
+          {theme === "light" ? (
+            <Moon className="w-5 h-5" />
+          ) : (
+            <Sun className="w-5 h-5" />
+          )}
         </button>
 
-        {openDropdown && (
-          <div className="absolute right-0 mt-2 w-56 bg-white border rounded-md shadow-lg animate-fade-in z-50">
-            <Link href="/profile">
-              <div className="px-4 py-3 border-b">
-                <p className="text-gray-800 font-semibold">{userName}</p>
+        {/* Avatar Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setOpenDropdown(!openDropdown)}
+            className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold hover:bg-blue-600 focus:outline-none transition-all duration-300"
+          >
+            {getInitials(userName || "U")}
+          </button>
 
-                <p className="text-gray-500 text-sm">
-                  {getRoleLabel(userRole || "")}
-                </p>
-              </div>
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-4 py-2 hover:bg-red-100 text-gray-800 hover:text-red-600 focus:bg-red-100 focus:text-red-600 transition-all duration-200"
-            >
-              🚪 Logout
-            </button>
-          </div>
-        )}
+          {openDropdown && (
+            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg animate-fade-in z-50">
+              <Link href="/profile">
+                <div className="px-4 py-3 border-b dark:border-gray-700 cursor-pointer">
+                  <p className="text-gray-800 dark:text-white font-semibold">
+                    {userName}
+                  </p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    {getRoleLabel(userRole || "")}
+                  </p>
+                </div>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-gray-800 dark:text-gray-200 hover:text-red-600 dark:hover:text-red-400 focus:outline-none transition-all duration-200"
+              >
+                🚪 Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

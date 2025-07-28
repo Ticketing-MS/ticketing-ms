@@ -16,15 +16,15 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="flex">
+    <div className="flex bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
       <SidebarAdmin onToggleWidth={handleSidebarToggle} />
       <main
-        className={`transition-all duration-300 min-h-screen flex-1 bg-gray-100 ${
+        className={`transition-all duration-300 flex-1 ${
           isSidebarOpen ? "ml-64" : "ml-16"
-        }`}
+        } bg-gray-100 dark:bg-gray-900`}
       >
         <Navbar />
-        <div className="p-6">{children}</div>
+        <div>{children}</div>
       </main>
     </div>
   );

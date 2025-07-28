@@ -123,53 +123,46 @@ export default function ManagementUserPage() {
           <input
             type="text"
             placeholder="Search user..."
-            className="px-4 py-2 border border-gray-300 rounded w-full text-gray-600 sm:w-64"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-sky-500"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded shadow">
+      <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded shadow">
         <table className="min-w-full leading-normal">
           <thead>
             <tr>
-              <th className="px-5 py-3 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-5 py-3 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Email
-              </th>
-              <th className="px-5 py-3 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Role
-              </th>
-              <th className="px-5 py-3 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-5 py-3 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Action
-              </th>
+              {["Name", "Email", "Role", "Status", "Action"].map((heading) => (
+                <th
+                  key={heading}
+                  className="px-5 py-3 bg-gray-100 dark:bg-gray-700 text-left text-xs font-semibold text-gray-600 dark:text-gray-200 uppercase tracking-wider"
+                >
+                  {heading}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {filtered.map((user) => (
-              <tr key={user.id} className="border-b">
-                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500">
+              <tr key={user.id} className="border-b border-gray-200 dark:border-gray-700">
+                <td className="px-5 py-3 text-left text-sm text-gray-700 dark:text-gray-200">
                   {user.name}
                 </td>
-                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500">
+                <td className="px-5 py-3 text-left text-sm text-gray-700 dark:text-gray-200">
                   {user.email}
                 </td>
-                <td className="px-5 py-4 align-top">
+                <td className="px-5 py-4 align-top text-sm text-gray-700 dark:text-gray-200">
                   <div className="flex flex-col gap-2">
-                    <label className="block text-sm text-xs font-semibold text-gray-500">
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-300">
                       Role
                     </label>
                     <select
                       disabled={loadingId === user.id}
                       value={user.role}
                       onChange={(e) => updateUserRole(user.id, e.target.value)}
-                      className="w-full px-2 py-2 border border-gray-300 text-xs font-semibold text-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm"
+                      className="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-xs font-semibold text-gray-700 dark:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
                     >
                       {ROLES.map((role) => (
                         <option key={role} value={role}>
@@ -180,47 +173,43 @@ export default function ManagementUserPage() {
 
                     {user.role === "pm" && (
                       <div className="mt-2 space-y-1">
-                        <label className="flex items-center text-xs font-semibold text-gray-500">
-                          <input
-                            type="checkbox"
-                            checked={user.team?.includes("cloud")}
-                            onChange={() => toggleTeam(user.id, "cloud")}
-                            className="mr-2"
-                          />
-                          Cloud
-                        </label>
-                        <label className="flex items-center text-xs font-semibold text-gray-500">
-                          <input
-                            type="checkbox"
-                            checked={user.team?.includes("devops")}
-                            onChange={() => toggleTeam(user.id, "devops")}
-                            className="mr-2"
-                          />
-                          DevOps
-                        </label>
+                        {["cloud", "devops"].map((team) => (
+                          <label
+                            key={team}
+                            className="flex items-center text-xs font-semibold text-gray-500 dark:text-gray-300"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={user.team?.includes(team)}
+                              onChange={() => toggleTeam(user.id, team)}
+                              className="mr-2"
+                            />
+                            {team.charAt(0).toUpperCase() + team.slice(1)}
+                          </label>
+                        ))}
                       </div>
                     )}
                   </div>
                 </td>
-                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500">
+                <td className="px-5 py-3 text-left text-sm">
                   <span
                     className={`inline-block px-3 py-1 text-sm font-semibold rounded-full ${
                       user.isActive
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                     }`}
                   >
                     {user.isActive ? "Aktif" : "Nonaktif"}
                   </span>
                 </td>
-                <td className="px-5 py-3 text-left text-xs font-semibold text-gray-500">
+                <td className="px-5 py-3 text-left text-sm">
                   <button
                     disabled={loadingId === user.id}
                     onClick={() => toggleUserStatus(user.id, user.isActive)}
-                    className={`px-3 py-2 text-sm rounded text-xs font-semibold text-gray-500 ${
+                    className={`px-3 py-2 rounded text-xs font-semibold text-white transition-colors ${
                       user.isActive
-                        ? "bg-red-500 text-white hover:bg-red-600"
-                        : "bg-green-500 text-white hover:bg-green-600"
+                        ? "bg-red-500 hover:bg-red-600"
+                        : "bg-green-500 hover:bg-green-600"
                     }`}
                   >
                     {user.isActive ? "Nonaktifkan" : "Aktifkan"}
@@ -230,7 +219,7 @@ export default function ManagementUserPage() {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center py-4 text-gray-500">
+                <td colSpan={5} className="text-center py-4 text-gray-500 dark:text-gray-300">
                   Tidak ada user ditemukan.
                 </td>
               </tr>
