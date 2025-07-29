@@ -22,6 +22,6 @@ body {
 
 html,
 body {
-  overflow-x: hidden;   /* ❌ cegah scroll horizontal */
-  overflow-y: auto;     /* ✅ tetap bisa scroll vertikal */
+  overflow-x: hidden; 
+  overflow-y: auto;     
 }

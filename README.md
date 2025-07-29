@@ -21,6 +21,3 @@ npx drizzle-kit pus
 
 install modules nya 
 npm install or yarn install 
-
-untuk db nya bisa cek disini 
-https://console.neon.tech/app/projects/cool-term-92001681/branches/br-damp-bush-a1054lwy/tables?database=dbTiketing
