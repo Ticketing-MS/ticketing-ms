@@ -15,19 +15,30 @@ const roleLabelMap: Record<string, string> = {
 export default function AdminDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const raw = localStorage.getItem("user");
-    if (raw) setUser(JSON.parse(raw));
+    const checkUser = async () => {
+      const res = await fetch("/api/jwt", { credentials: "include" });
+      if (!res.ok) {
+        router.push("/login");
+        return;
+      }
+
+      const { user } = await res.json();
+      if (user.role !== "admin") {
+        router.push("/");
+        return;
+      }
+
+      setUser(user);
+      setLoading(false);
+    };
+
+    checkUser();
   }, []);
 
-  useEffect(() => {
-    const rawUser = localStorage.getItem("user");
-    if (!rawUser) return router.push("/");
-
-    const user = JSON.parse(rawUser);
-    if (user.role !== "admin") router.push("/");
-  }, []);
+  if (loading) return null;
 
   return (
     <div className="flex overflow-y-auto">

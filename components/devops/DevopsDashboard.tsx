@@ -1,21 +1,31 @@
-"use client";
-
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Home } from "lucide-react";
 
-const roleLabelMap: Record<string, string> = {
-  admin: "Admin",
-  cloud: "Cloud",
-  devops: "DevOps",
-  pm: "Project Manager",
-};
-
 export default function DevopsDashboard() {
-  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; team: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const raw = localStorage.getItem("user");
-    if (raw) setUser(JSON.parse(raw));
+    const checkUser = async () => {
+      const res = await fetch("/api/jwt", { credentials: "include" });
+      if (!res.ok) {
+        router.push("/login");
+        return;
+      }
+
+      const { user } = await res.json();
+      if (user.team !== "devops") {
+        router.push("/unauthorized");
+        return;
+      }
+
+      setUser(user);
+      setLoading(false);
+    };
+
+    checkUser();
   }, []);
 
   return (

@@ -23,9 +23,8 @@ export default function LoginPage() {
     });
 
     const data = await res.json();
+    
     if (!res.ok) return setError(data.message);
-
-    localStorage.setItem("user", JSON.stringify(data));
 
     const redirectByTeam: Record<string, string> = {
       cloud: "/cloud",

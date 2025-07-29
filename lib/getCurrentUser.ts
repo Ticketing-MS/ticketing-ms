@@ -3,17 +3,15 @@ import { cookies } from "next/headers";
 
 const secret = process.env.JWT_SECRET!;
 
-// getCurrentUser
 export async function getCurrentUser() {
   const token = cookies().get("token")?.value;
-
   if (!token) return null;
 
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET!);
-    return user;
-  } catch (err) {
-    console.error("JWT verify error:", err); // ⬅️ Log error JWT
+    const decoded = jwt.verify(token, secret);
+    if (typeof decoded === "string") return null;
+    return decoded;
+  } catch {
     return null;
   }
 }

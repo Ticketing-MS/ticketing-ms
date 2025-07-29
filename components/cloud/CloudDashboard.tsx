@@ -1,28 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Home } from "lucide-react";
 
 export default function CloudDashboard() {
   const [user, setUser] = useState<{ name: string; team: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const raw = localStorage.getItem("user");
-    if (raw) {
-      const parsed = JSON.parse(raw);
-
-      // ⬇️ Validasi berdasarkan team, BUKAN role
-      if (parsed.team !== "cloud") {
-        window.location.href = "/unauthorized";
-      } else {
-        setUser(parsed);
+    const checkUser = async () => {
+      const res = await fetch("/api/jwt", { credentials: "include" });
+      if (!res.ok) {
+        router.push("/login");
+        return;
       }
-    } else {
-      window.location.href = "/unauthorized";
-    }
 
-    setLoading(false);
+      const { user } = await res.json();
+      if (user.team !== "cloud") {
+        router.push("/unauthorized");
+        return;
+      }
+
+      setUser(user);
+      setLoading(false);
+    };
+
+    checkUser();
   }, []);
 
   if (loading) return null;

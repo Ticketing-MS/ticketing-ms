@@ -40,7 +40,7 @@ const roleBasedMenus: RoleMenuMap = {
 type User = {
   role: string;
   team?: string;
-  access?: string[];
+  access?: string[]; // optional access to other teams
 };
 
 export default function SidebarAdmin({
@@ -53,15 +53,18 @@ export default function SidebarAdmin({
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const raw = localStorage.getItem("user");
-    if (raw) {
+    const fetchUser = async () => {
       try {
-        const parsed: User = JSON.parse(raw);
-        setUser(parsed);
-      } catch (e) {
-        console.error("Invalid user in localStorage");
+        const res = await fetch("/api/jwt", { credentials: "include" });
+        if (!res.ok) return;
+
+        const { user } = await res.json();
+        setUser(user);
+      } catch (err) {
       }
-    }
+    };
+
+    fetchUser();
   }, []);
 
   const toggleSidebar = () => {

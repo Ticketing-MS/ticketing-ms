@@ -11,20 +11,29 @@ export default function CloudLayout({
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const handleSidebarToggle = (collapsed: boolean) => {
-    setIsSidebarOpen(!collapsed);
-  };
   return (
-    <div className="flex bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
-      <SidebarAdmin onToggleWidth={handleSidebarToggle} />
-      <main
-        className={`transition-all duration-300 flex-1 ${
-          isSidebarOpen ? "ml-64" : "ml-16"
-        } bg-gray-100 dark:bg-gray-900`}
-      >
-        <Navbar />
-        <div>{children}</div>
-      </main>
+    <div className="flex h-screen overflow-hidden">
+      <SidebarAdmin
+        onToggleWidth={(collapsed) => setIsSidebarOpen(!collapsed)}
+      />
+
+      <div className="flex flex-col flex-1 bg-gray-100 dark:bg-gray-900 overflow-hidden">
+        <div
+          className={`sticky top-0 z-50 transition-all duration-300 ${
+            isSidebarOpen ? "ml-64" : "ml-16"
+          }`}
+        >
+          <Navbar />
+        </div>
+
+        <div
+          className={`flex-1 overflow-y-auto overflow-x-hidden px-0 py-4 ${
+            isSidebarOpen ? "ml-64" : "ml-16"
+          }`}
+        >
+          {children}
+        </div>
+      </div>
     </div>
   );
 }

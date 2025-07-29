@@ -17,6 +17,8 @@ interface User {
 
 export default function MyProfilePage() {
   const router = useRouter();
+  const pathname = usePathname();
+
   const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,6 +32,38 @@ export default function MyProfilePage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
+  // 🔒 Cek auth pakai /api/jwt, bukan localStorage
+  useEffect(() => {
+    const validateUser = async () => {
+      try {
+        const res = await fetch("/api/jwt", { credentials: "include" });
+        if (!res.ok) {
+          router.replace("/login");
+          return;
+        }
+
+        const { user } = await res.json();
+
+        // Kalau buka di "/", redirect sesuai role
+        if (pathname === "/") {
+          const roleToPath: Record<string, string> = {
+            admin: "/admin",
+            cloud: "/cloud",
+            devops: "/devops",
+            pm: "/pm",
+          };
+          const target = roleToPath[user.role] ?? "/";
+          router.replace(target);
+        }
+      } catch (err) {
+        router.replace("/login");
+      }
+    };
+
+    validateUser();
+  }, [pathname, router]);
+
+  // Ambil data user dari DB
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -39,33 +73,10 @@ export default function MyProfilePage() {
         setName(data.name);
         setEmail(data.email);
       } catch (error) {
-        console.error("Gagal memuat data user");
       }
     };
     fetchUser();
   }, []);
-
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const raw = localStorage.getItem("user");
-    if (raw) {
-      const user = JSON.parse(raw);
-      const roleToPath: Record<string, string> = {
-        admin: "/admin",
-        cloud: "/cloud",
-        devops: "/devops",
-        pm: "/pm",
-      };
-
-      if (pathname === "/") {
-        const target = roleToPath[user.role] ?? "/";
-        router.replace(target);
-      }
-    } else {
-      router.replace("/login");
-    }
-  }, [router, pathname]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -132,7 +143,6 @@ export default function MyProfilePage() {
       toast.success("Profile updated successfully");
     } catch (err) {
       toast.error("Error updating profile");
-      console.error(err);
     } finally {
       setLoading(false);
     }

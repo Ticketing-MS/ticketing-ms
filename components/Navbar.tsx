@@ -15,23 +15,24 @@ export default function Navbar() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const { theme, toggleTheme } = useTheme();
 
-  // Logout
   const handleLogout = async () => {
-    localStorage.removeItem("user");
     await fetch("/api/logout", { method: "POST" });
     router.push("/login");
   };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
+    const fetchUser = async () => {
+      const res = await fetch("/api/jwt", {
+        credentials: "include",
+      });
+      if (!res.ok) return;
+      const { user } = await res.json();
       setUserName(user.name || "");
       setUserRole(user.role || "");
-    }
+    };
+    fetchUser();
   }, []);
 
-  // Auto-close dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -42,10 +43,10 @@ export default function Navbar() {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Heartbeat polling setiap 30 detik
   useEffect(() => {
     const sendHeartbeat = async () => {
       const res = await fetch("/api/heartbeat", {
@@ -53,11 +54,10 @@ export default function Navbar() {
         credentials: "include",
       });
       if (res.status === 401) {
-        localStorage.removeItem("user");
         router.push("/login");
       }
     };
-    sendHeartbeat(); // pertama kali
+    sendHeartbeat();
     const interval = setInterval(sendHeartbeat, 30_000);
     return () => clearInterval(interval);
   }, []);
@@ -110,11 +110,7 @@ export default function Navbar() {
           onClick={toggleTheme}
           className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
         >
-          {theme === "light" ? (
-            <Moon className="w-5 h-5" />
-          ) : (
-            <Sun className="w-5 h-5" />
-          )}
+          {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
         </button>
 
         <div className="relative" ref={dropdownRef}>

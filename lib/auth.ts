@@ -5,12 +5,11 @@ import { compare, hash } from "bcryptjs";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
-const secret =
-  process.env.NODE_ENV === "production"
-    ? process.env.JWT_SECRET_PROD!
-    : process.env.JWT_SECRET_DEV!;
+const secret = process.env.JWT_SECRET!;
 
-// Fungsi Login
+// ===========================
+// Login
+// ===========================
 export async function loginUser(email: string, password: string) {
   const user = await db
     .select()
@@ -21,13 +20,13 @@ export async function loginUser(email: string, password: string) {
   if (!user || !(await compare(password, user.password))) return null;
   if (!user.isActive) throw new Error("disabled");
 
-  // Update status
+  // Update status login
   await db
     .update(users)
     .set({ isActive: true, lastLoginAt: new Date() })
     .where(eq(users.id, user.id));
 
-  // JWT token
+  // Generate JWT
   const token = jwt.sign(
     {
       id: user.id,
@@ -42,30 +41,25 @@ export async function loginUser(email: string, password: string) {
   return { token, user };
 }
 
-// Ambil user dari cookies
+// ===========================
+// getCurrentUser via JWT
+// ===========================
 export async function getCurrentUser() {
-  const userId = (await cookies()).get("user_id")?.value;
-  if (!userId) return null;
+  const token = cookies().get("token")?.value;
+  if (!token) return null;
 
-  const user = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, userId))
-    .then((res) => res[0]);
-
-  if (!user) return null;
-
-  return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-    team: user.team,
-    avatarUrl: user.avatarUrl,
-  };
+  try {
+    const decoded = jwt.verify(token, secret);
+    if (typeof decoded === "string") return null;
+    return decoded; // contains id, name, role, team
+  } catch {
+    return null;
+  }
 }
 
+// ===========================
 // Register
+// ===========================
 type RegisterInput = {
   name: string;
   email: string;
@@ -106,12 +100,14 @@ export async function registerUser({
   return newUser;
 }
 
+// ===========================
 // Update profile
+// ===========================
 export async function updateProfile(
   userId: string,
   data: { name?: string; email?: string }
 ) {
-  const [updateUser] = await db
+  const [updatedUser] = await db
     .update(users)
     .set({
       name: data.name,
@@ -120,5 +116,5 @@ export async function updateProfile(
     .where(eq(users.id, userId))
     .returning();
 
-  return updateUser;
+  return updatedUser;
 }

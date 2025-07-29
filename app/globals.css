@@ -19,3 +19,9 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, sans-serif;
 }
+
+html,
+body {
+  overflow-x: hidden;   /* ❌ cegah scroll horizontal */
+  overflow-y: auto;     /* ✅ tetap bisa scroll vertikal */
+}
