@@ -48,7 +48,10 @@ export default function Navbar() {
   // Heartbeat polling setiap 30 detik
   useEffect(() => {
     const sendHeartbeat = async () => {
-      const res = await fetch("/api/heartbeat", { method: "POST" });
+      const res = await fetch("/api/heartbeat", {
+        method: "POST",
+        credentials: "include",
+      });
       if (res.status === 401) {
         localStorage.removeItem("user");
         router.push("/login");

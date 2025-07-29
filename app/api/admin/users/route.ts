@@ -15,7 +15,6 @@ export async function GET() {
       lastLoginAt: users.lastLoginAt,
     })
     .from(users);
-      console.log("📦 allUsers:", allUsers); // ⬅️ Tambahkan ini untuk debug
 
   return NextResponse.json(allUsers);
 }

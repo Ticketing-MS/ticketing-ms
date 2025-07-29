@@ -3,6 +3,12 @@ import { users } from "db/schema";
 import { eq } from "drizzle-orm";
 import { compare, hash } from "bcryptjs";
 import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
+
+const secret =
+  process.env.NODE_ENV === "production"
+    ? process.env.JWT_SECRET_PROD!
+    : process.env.JWT_SECRET_DEV!;
 
 // Fungsi Login
 export async function loginUser(email: string, password: string) {
@@ -15,32 +21,25 @@ export async function loginUser(email: string, password: string) {
   if (!user || !(await compare(password, user.password))) return null;
   if (!user.isActive) throw new Error("disabled");
 
+  // Update status
   await db
     .update(users)
-    .set({
-      isActive: true,
-      lastLoginAt: new Date(),
-    })
+    .set({ isActive: true, lastLoginAt: new Date() })
     .where(eq(users.id, user.id));
 
-  const updatedUser = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, user.id))
-    .then((res) => res[0]);
+  // JWT token
+  const token = jwt.sign(
+    {
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      team: user.team,
+    },
+    secret,
+    { expiresIn: "7d" }
+  );
 
-  (await cookies()).set("user_id", updatedUser.id);
-
-  return {
-    id: updatedUser.id,
-    name: updatedUser.name,
-    email: updatedUser.email,
-    role: updatedUser.role,
-    team: updatedUser.team,
-    isActive: updatedUser.isActive,
-    avatarUrl: updatedUser.avatarUrl,
-    lastLoginAt: updatedUser.lastLoginAt?.toISOString() ?? null,
-  };
+  return { token, user };
 }
 
 // Ambil user dari cookies

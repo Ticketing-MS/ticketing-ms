@@ -1,48 +1,37 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { protectedRoutes, roleRoutes } from "lib/routes";
 
 export function middleware(request: NextRequest) {
+  const token = request.cookies.get("token")?.value;
   const { pathname } = request.nextUrl;
-  const userCookie = request.cookies.get("user")?.value;
 
-  // ⛔ Redirect ke login kalau belum login & akses route terlindungi
-  if (
-    !userCookie &&
-    protectedRoutes.some((route) => pathname.startsWith(route))
-  ) {
+  if (!token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (userCookie) {
-    try {
-      const user = JSON.parse(decodeURIComponent(userCookie));
+  try {
+    // Decode payload (tanpa verify signature)
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const { role, team } = payload;
 
-      // ⛔ User nonaktif
-      if (user.isActive === false) {
-        return NextResponse.redirect(new URL("/login", request.url));
-      }
-
-      // ✅ Cek akses berdasarkan role atau team
-      for (const [routeKey] of Object.entries(roleRoutes)) {
-        if (pathname.startsWith(`/${routeKey}`)) {
-          // admin dicek berdasarkan role
-          if (routeKey === "admin" && user.role !== "admin") {
-            return NextResponse.redirect(new URL("/login", request.url));
-          }
-          // team lainnya dicek berdasarkan team
-          if (
-            ["cloud", "pm", "devops"].includes(routeKey) &&
-            user.team !== routeKey
-          ) {
-            return NextResponse.redirect(new URL("/login", request.url));
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Error parsing user cookie:", err);
+    // Admin check
+    if (pathname.startsWith("/admin") && role !== "admin") {
       return NextResponse.redirect(new URL("/login", request.url));
     }
+
+    // Staff (cloud, pm, devops) check
+    const validTeams = ["cloud", "pm", "devops"];
+    const currentTeam = pathname.split("/")[1];
+
+    if (validTeams.includes(currentTeam)) {
+      if (role !== "staff" || team !== currentTeam) {
+        return NextResponse.redirect(new URL("/login", request.url));
+      }
+    }
+
+  } catch (err) {
+    console.error("JWT parse error:", err);
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
