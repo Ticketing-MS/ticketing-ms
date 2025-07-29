@@ -14,10 +14,12 @@ export const users = pgTable("users", {
   name: varchar("name", { length: 100 }).notNull(),
   email: varchar("email", { length: 100 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
-  role: text("role").default("user").notNull(), // user | admin | staff
+  role: text("role").default("user").notNull(), 
   createdAt: timestamp("created_at").defaultNow(),
   isActive: boolean("is_active").default(true),
-  team: text("team").array().default([]), // e.g., ["cloud", "devops"]
+  lastLoginAt: timestamp("last_login_at", { mode: "date" }),
+  team: text("team").default("user").notNull(), 
+  access: text("access").array().default([]),
   avatarUrl: text("avatar_url"),
 });
 
@@ -33,12 +35,21 @@ export const priorities = pgTable("priorities", {
   level: varchar("level", { length: 20 }).notNull().unique(), // e.g., low | medium | high
 });
 
+export const projects = pgTable("projects", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  team: text("team").notNull(),
+  createdBy: uuid("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // --- Tickets
 export const tickets = pgTable("tickets", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title", { length: 200 }).notNull(),
   description: text("description").notNull(),
-  status: text("status").default("open").notNull(), // 'open' | 'in_progress' | 'closed'
+  status: text("status").default("open").notNull(),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -55,6 +66,9 @@ export const tickets = pgTable("tickets", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   team: text("team").notNull().default("cloud"),
+  projectId: uuid("project_id").references(() => projects.id, {
+    onDelete: "set null",
+  }),
 });
 
 // --- Ticket Replies

@@ -8,13 +8,13 @@ export async function PATCH(req: NextRequest, context: any) {
   const { params } = await Promise.resolve(context); // trick untuk hilangkan warning
   const userId = params.id;
 
-  const { team } = await req.json();
+  const { access } = await req.json();
 
-  if (!Array.isArray(team)) {
+  if (!Array.isArray(access)) {
     return new Response(JSON.stringify({ message: "Invalid team format" }), { status: 400 });
   }
 
-  await db.update(users).set({ team }).where(eq(users.id, userId));
+  await db.update(users).set({ access }).where(eq(users.id, userId));
 
   return new Response(JSON.stringify({ message: "Team updated" }), { status: 200 });
 }

@@ -6,19 +6,37 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const userCookie = request.cookies.get("user")?.value;
 
-  if (!userCookie && protectedRoutes.some(route => pathname.startsWith(route))) {
+  // ⛔ Redirect ke login kalau belum login & akses route terlindungi
+  if (
+    !userCookie &&
+    protectedRoutes.some((route) => pathname.startsWith(route))
+  ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   if (userCookie) {
     try {
       const user = JSON.parse(decodeURIComponent(userCookie));
+
+      // ⛔ User nonaktif
       if (user.isActive === false) {
         return NextResponse.redirect(new URL("/login", request.url));
       }
-      for (const [role, allowedPaths] of Object.entries(roleRoutes)) {
-        if (pathname.startsWith(`/${role}`) && user.role !== role) {
-          return NextResponse.redirect(new URL("/unauthorized", request.url));
+
+      // ✅ Cek akses berdasarkan role atau team
+      for (const [routeKey] of Object.entries(roleRoutes)) {
+        if (pathname.startsWith(`/${routeKey}`)) {
+          // admin dicek berdasarkan role
+          if (routeKey === "admin" && user.role !== "admin") {
+            return NextResponse.redirect(new URL("/login", request.url));
+          }
+          // team lainnya dicek berdasarkan team
+          if (
+            ["cloud", "pm", "devops"].includes(routeKey) &&
+            user.team !== routeKey
+          ) {
+            return NextResponse.redirect(new URL("/login", request.url));
+          }
         }
       }
     } catch (err) {
@@ -31,10 +49,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/admin/:path*",
-    "/cloud/:path*",
-    "/pm/:path*",
-    "/devops/:path*",
-  ],
+  matcher: ["/admin/:path*", "/cloud/:path*", "/pm/:path*", "/devops/:path*"],
 };

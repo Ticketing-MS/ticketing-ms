@@ -8,6 +8,41 @@
       "when": 1753622004492,
       "tag": "0000_regular_maximus",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753728433143,
+      "tag": "0001_chief_power_pack",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753729351687,
+      "tag": "0002_strong_shiver_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1753729849459,
+      "tag": "0003_whole_deathbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1753731833264,
+      "tag": "0004_shocking_tusk",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1753772274316,
+      "tag": "0005_flaky_the_santerians",
+      "breakpoints": true
     }
   ]
 }

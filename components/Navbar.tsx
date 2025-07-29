@@ -1,40 +1,26 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { useTheme } from "components/theme-provider";
 import { Sun, Moon } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const [openDropdown, setOpenDropdown] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const { theme, toggleTheme } = useTheme();
 
-  const handleLogout = () => {
+  // Logout
+  const handleLogout = async () => {
     localStorage.removeItem("user");
+    await fetch("/api/logout", { method: "POST" });
     router.push("/login");
   };
-
-  function getInitials(name: string): string {
-    const words = name.trim().split(" ");
-    if (words.length === 1) return words[0][0]?.toUpperCase() ?? "";
-    return (words[0][0] + words[1][0]).toUpperCase();
-  }
-
-  function getRoleLabel(role: string): string {
-    const roles: Record<string, string> = {
-      admin: "Admin",
-      cloud: "Cloud",
-      devops: "DevOps",
-      pm: "Project Manager",
-    };
-    return roles[role] || role;
-  }
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -45,6 +31,7 @@ export default function Navbar() {
     }
   }, []);
 
+  // Auto-close dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -57,6 +44,37 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Heartbeat polling setiap 30 detik
+  useEffect(() => {
+    const sendHeartbeat = async () => {
+      const res = await fetch("/api/heartbeat", { method: "POST" });
+      if (res.status === 401) {
+        localStorage.removeItem("user");
+        router.push("/login");
+      }
+    };
+    sendHeartbeat(); // pertama kali
+    const interval = setInterval(sendHeartbeat, 30_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const getInitials = (name: string) => {
+    const words = name.trim().split(" ");
+    return words.length === 1
+      ? words[0][0]?.toUpperCase() ?? ""
+      : (words[0][0] + words[1][0]).toUpperCase();
+  };
+
+  const getRoleLabel = (role: string) => {
+    const roles: Record<string, string> = {
+      admin: "Admin",
+      cloud: "Cloud",
+      devops: "DevOps",
+      pm: "Project Manager",
+    };
+    return roles[role] || role;
+  };
 
   const getTitle = () => {
     if (pathname.startsWith("/admin")) {
@@ -72,11 +90,9 @@ export default function Navbar() {
       if (pathname.startsWith("/admin/register-user")) return "Register User";
       return "Admin Panel";
     }
-
     if (pathname.startsWith("/cloud")) return "Cloud Panel";
     if (pathname.startsWith("/devops")) return "DevOps Panel";
     if (pathname.startsWith("/pm")) return "PM Panel";
-
     return "Dashboard";
   };
 
@@ -87,7 +103,6 @@ export default function Navbar() {
       </h2>
 
       <div className="flex items-center gap-3">
-        {/* Toggle Theme Button */}
         <button
           onClick={toggleTheme}
           className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
@@ -99,17 +114,16 @@ export default function Navbar() {
           )}
         </button>
 
-        {/* Avatar Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setOpenDropdown(!openDropdown)}
-            className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold hover:bg-blue-600 focus:outline-none transition-all duration-300"
+            className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold hover:bg-blue-600"
           >
             {getInitials(userName || "U")}
           </button>
 
           {openDropdown && (
-            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg animate-fade-in z-50">
+            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg z-50">
               <Link href="/profile">
                 <div className="px-4 py-3 border-b dark:border-gray-700 cursor-pointer">
                   <p className="text-gray-800 dark:text-white font-semibold">
@@ -122,7 +136,7 @@ export default function Navbar() {
               </Link>
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-gray-800 dark:text-gray-200 hover:text-red-600 dark:hover:text-red-400 focus:outline-none transition-all duration-200"
+                className="w-full text-left px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900 text-gray-800 dark:text-gray-200 hover:text-red-600 dark:hover:text-red-400"
               >
                 🚪 Logout
               </button>

@@ -3,9 +3,9 @@ import { registerUser } from "lib/auth";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, password, role } = body;
+    const { name, email, password, role, team } = body;
 
-    const result = await registerUser({ name, email, password, role });
+    const result = await registerUser({ name, email, password, role, team });
 
     return new Response(JSON.stringify({ success: true, user: result }), {
       status: 201,
@@ -14,7 +14,6 @@ export async function POST(req: Request) {
       },
     });
   } catch (err) {
-    console.error("Register error:", err);
     return new Response(
       JSON.stringify({ message: "Failed to register user" }),
       {

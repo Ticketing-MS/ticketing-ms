@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import AdminUserTable from "components/AdminUserTable.tsx";
+import AdminUserTable from "components/admin/AdminUserTable.tsx";
 import { Home } from "lucide-react";
 
 const roleLabelMap: Record<string, string> = {

@@ -10,7 +10,8 @@ export default function RegisterUserForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("admin");
+  const [role, setRole] = useState("");
+  const [team, setTeam] = useState("");
   const [access, setAccess] = useState<string[]>([]);
   const [message, setMessage] = useState("");
 
@@ -20,7 +21,7 @@ export default function RegisterUserForm() {
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, role, access }),
+      body: JSON.stringify({ name, email, password, role, team, access }),
     });
 
     const data = await res.json();
@@ -112,14 +113,34 @@ export default function RegisterUserForm() {
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
             >
               <option value="admin">Admin</option>
-              <option value="cloud">Cloud</option>
-              <option value="devops">DevOps</option>
-              <option value="pm">Project Manager</option>
+              <option value="cloud">Staff</option>
+            </select>
+          </div>
+
+          {/* Team */}
+          <div>
+            <label className="block mb-1 text-sm text-gray-600 dark:text-gray-300">
+              Team
+            </label>
+            <select
+              value={team}
+              onChange={(e) => setTeam(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+            >
+              {role === "admin" ? (
+                <option value="admin">Admin</option>
+              ) : (
+                <>
+                  <option value="cloud">Cloud</option>
+                  <option value="devops">DevOps</option>
+                  <option value="pm">Project Manager</option>
+                </>
+              )}
             </select>
           </div>
 
           {/* Access for PM */}
-          {role === "pm" && (
+          {team === "pm" && (
             <div className="flex gap-4">
               <label className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                 <input

@@ -27,14 +27,19 @@ export default function LoginPage() {
 
     localStorage.setItem("user", JSON.stringify(data));
 
-    const roleRedirectMap: Record<string, string> = {
-      admin: "/admin",
+    const redirectByTeam: Record<string, string> = {
       cloud: "/cloud",
       devops: "/devops",
       pm: "/pm",
     };
-    const redirectPath = roleRedirectMap[data.role] || "/admin";
-    router.push(redirectPath);
+
+    if (data.role === "admin") {
+      router.push("/admin");
+    } else if (data.role === "staff") {
+      router.push(redirectByTeam[data.team] || "/");
+    } else {
+      router.push("/");
+    }
   };
 
   return (

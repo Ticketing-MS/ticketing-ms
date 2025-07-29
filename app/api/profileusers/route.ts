@@ -17,6 +17,7 @@ export async function GET() {
     name: user.name,
     email: user.email,
     role: user.role,
+    team: user.team,
     avatarUrl: user.avatarUrl,
   });
 }
@@ -63,7 +64,6 @@ export async function POST(req: Request) {
         .from(users)
         .where(eq(users.id, sessionUser.id))
         .then((res) => res[0]);
-        console.log("userfromdb", userFromDb)
 
       const isMatch = await bcrypt.compare(
         currentPassword,

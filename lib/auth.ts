@@ -15,8 +15,32 @@ export async function loginUser(email: string, password: string) {
   if (!user || !(await compare(password, user.password))) return null;
   if (!user.isActive) throw new Error("disabled");
 
-  (await cookies()).set("user_id", user.id);
-  return user;
+  await db
+    .update(users)
+    .set({
+      isActive: true,
+      lastLoginAt: new Date(),
+    })
+    .where(eq(users.id, user.id));
+
+  const updatedUser = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, user.id))
+    .then((res) => res[0]);
+
+  (await cookies()).set("user_id", updatedUser.id);
+
+  return {
+    id: updatedUser.id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    role: updatedUser.role,
+    team: updatedUser.team,
+    isActive: updatedUser.isActive,
+    avatarUrl: updatedUser.avatarUrl,
+    lastLoginAt: updatedUser.lastLoginAt?.toISOString() ?? null,
+  };
 }
 
 // Ambil user dari cookies
@@ -24,11 +48,22 @@ export async function getCurrentUser() {
   const userId = (await cookies()).get("user_id")?.value;
   if (!userId) return null;
 
-  return db
+  const user = await db
     .select()
     .from(users)
     .where(eq(users.id, userId))
     .then((res) => res[0]);
+
+  if (!user) return null;
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    team: user.team,
+    avatarUrl: user.avatarUrl,
+  };
 }
 
 // Register
@@ -37,9 +72,16 @@ type RegisterInput = {
   email: string;
   password: string;
   role: string;
+  team: string;
 };
 
-export async function registerUser({ name, email, password, role }: RegisterInput) {
+export async function registerUser({
+  name,
+  email,
+  password,
+  role,
+  team,
+}: RegisterInput) {
   const existing = await db
     .select()
     .from(users)
@@ -57,6 +99,7 @@ export async function registerUser({ name, email, password, role }: RegisterInpu
       email,
       password: hashedPassword,
       role,
+      team,
       isActive: true,
     })
     .returning();
@@ -65,7 +108,10 @@ export async function registerUser({ name, email, password, role }: RegisterInpu
 }
 
 // Update profile
-export async function updateProfile(userId: string, data: { name?: string; email?: string }) {
+export async function updateProfile(
+  userId: string,
+  data: { name?: string; email?: string }
+) {
   const [updateUser] = await db
     .update(users)
     .set({
