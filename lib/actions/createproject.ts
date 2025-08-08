@@ -9,6 +9,7 @@ export async function createProject(data: {
   name: string;
   description?: string;
   team: string;
+  slug: string;
 }) {
   const user = await getCurrentUser();
   if (!user) return { error: "Unauthorized" };
@@ -19,6 +20,7 @@ export async function createProject(data: {
     await db.insert(projects).values({
       id,
       name: data.name,
+      slug: data.slug,
       description: data.description || "",
       team: data.team,
       createdBy: user.id,

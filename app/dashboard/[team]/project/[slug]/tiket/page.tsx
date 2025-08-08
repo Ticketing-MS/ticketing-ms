@@ -2,7 +2,6 @@ import { db } from "db";
 import { projects } from "db/schema";
 import { eq } from "drizzle-orm";
 import { TicketBoardClient } from "components/team/tiketlist/TiketBoardClient";
-import Link from "next/link";
 
 type Props = {
   params: { slug: string };
@@ -30,7 +29,7 @@ export default async function TicketPage({ params }: Props) {
         </div>
       </div>
 
-      <TicketBoardClient projectSlug={project.slug} />
+      <TicketBoardClient projectSlug={project.slug} team="team" />
     </main>
   );
 }
