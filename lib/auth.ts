@@ -53,7 +53,6 @@ export async function getCurrentUser() {
 
     const user = await db.query.users.findFirst({
       where: eq(users.id, userId),
-      // ✅ pastikan semua kolom yang dibutuhkan diambil
       columns: {
         id: true,
         name: true,
@@ -61,7 +60,7 @@ export async function getCurrentUser() {
         role: true,
         team: true,
         avatarUrl: true,
-        access: true, // kalau ada kolom JSON array untuk akses PM
+        access: true,
       },
     });
 

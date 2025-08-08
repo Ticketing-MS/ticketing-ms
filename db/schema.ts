@@ -61,7 +61,7 @@ export const tickets = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     title: varchar("title", { length: 200 }).notNull(),
-    slug: varchar("slug", { length: 100 }).notNull(), // no global unique
+    slug: varchar("slug", { length: 100 }).notNull(),
     description: text("description").notNull(),
     status: text("status").default("").notNull(),
     statusId: uuid("status_id")

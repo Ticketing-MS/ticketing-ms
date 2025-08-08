@@ -10,8 +10,5 @@ export async function getProjectBySlug(slug: string) {
     .where(eq(projects.slug, slug))
     .limit(1);
 
-  console.log("🔍 Fetched project by slug:", slug);
-  console.log("📦 Result from DB:", result);
-
   return result[0];
 }

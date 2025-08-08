@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
     // ✅ Allow access
     return NextResponse.next();
   } catch (err) {
-    console.error("JWT verification failed:", err);
+    // console.error("JWT verification failed:", err);
     return NextResponse.redirect(new URL("/login", request.url));
   }
 }
