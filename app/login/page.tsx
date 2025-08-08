@@ -23,19 +23,18 @@ export default function LoginPage() {
     });
 
     const data = await res.json();
-    
+
     if (!res.ok) return setError(data.message);
 
-    const redirectByTeam: Record<string, string> = {
-      cloud: "/cloud",
-      devops: "/devops",
-      pm: "/pm",
-    };
-
+    // ✅ REDIRECT sesuai struktur baru
     if (data.role === "admin") {
-      router.push("/admin");
+      const validTeams = ["admin"];
+      const team = validTeams.includes(data.team) ? data.team : "";
+      router.push(`/dashboard/${team}`);
     } else if (data.role === "staff") {
-      router.push(redirectByTeam[data.team] || "/");
+      const validTeams = ["cloud", "devops", "pm"];
+      const team = validTeams.includes(data.team) ? data.team : "";
+      router.push(`/dashboard/${team}`);
     } else {
       router.push("/");
     }
@@ -43,7 +42,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex justify-center items-center">
-      {/* Toggle di pojok kanan atas */}
+      {/* Toggle theme di pojok kanan atas */}
       <button
         onClick={toggleTheme}
         className="absolute top-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
@@ -56,7 +55,7 @@ export default function LoginPage() {
       </button>
 
       <div className="max-w-screen-xl bg-white dark:bg-gray-800 shadow sm:rounded-lg flex w-full sm:m-10">
-        {/* Form */}
+        {/* Form section */}
         <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
           <div className="mt-12 flex flex-col items-center">
             <h1 className="text-2xl xl:text-3xl font-extrabold">Sign in</h1>

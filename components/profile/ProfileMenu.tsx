@@ -72,8 +72,7 @@ export default function MyProfilePage() {
         setUser(data);
         setName(data.name);
         setEmail(data.email);
-      } catch (error) {
-      }
+      } catch (error) {}
     };
     fetchUser();
   }, []);
@@ -141,6 +140,7 @@ export default function MyProfilePage() {
       );
 
       toast.success("Profile updated successfully");
+      setActiveTab("info");
     } catch (err) {
       toast.error("Error updating profile");
     } finally {
@@ -159,21 +159,15 @@ export default function MyProfilePage() {
     <div className="max-w-3xl mx-auto py-10 px-4 text-gray-800 dark:text-gray-200">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6 border border-gray-200 dark:border-gray-700">
         <button
-          onClick={() => {
-            const roleToPath: Record<string, string> = {
-              admin: "/admin",
-              cloud: "/cloud",
-              devops: "/devops",
-              pm: "/pm",
-            };
-            router.push(roleToPath[user.role] ?? "/");
-          }}
+          onClick={() => router.push(`/dashboard/${user.team}`)}
           className="text-sm text-blue-600 dark:text-blue-400 hover:underline mb-4 inline-flex items-center gap-1"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
 
-        <h1 className="text-3xl font-bold mb-2 text-gray-600 dark:text-gray-100">My Profile</h1>
+        <h1 className="text-3xl font-bold mb-2 text-gray-600 dark:text-gray-100">
+          My Profile
+        </h1>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
           Showing your data information and can change password
         </p>
@@ -214,15 +208,25 @@ export default function MyProfilePage() {
             >
               <div className="flex items-center space-x-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow-inner mb-6">
                 <img
-                  src={user.avatarUrl || "/default-avatar.png"}
+                  src={
+                    user.avatarUrl?.trim()
+                      ? user.avatarUrl
+                      : "/avatarDefault.png"
+                  }
                   alt="Profile Avatar"
                   className="w-16 h-16 rounded-full object-cover border border-gray-300"
                 />
                 <div>
                   <p className="text-lg font-semibold">{user.name}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-300">{user.email}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-300">{user.role}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-300">{user.team}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-300">
+                    {user.email}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-300">
+                    {user.role}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-300">
+                    {user.team}
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -256,7 +260,9 @@ export default function MyProfilePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">Name</label>
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
+                    Name
+                  </label>
                   <input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -265,7 +271,9 @@ export default function MyProfilePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">Email</label>
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
+                    Email
+                  </label>
                   <input
                     type="email"
                     value={email}

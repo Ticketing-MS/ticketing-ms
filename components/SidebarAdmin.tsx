@@ -18,36 +18,32 @@ type RoleMenuMap = {
 
 const roleBasedMenus: RoleMenuMap = {
   admin: [
-    { name: "Dashboard Admin", href: "/admin", icon: "🏠" },
-    { name: "Manage Users", href: "/admin/management-user", icon: "👥" },
-    { name: "Manage Categories", href: "/admin/statistik", icon: "📁" },
-    { name: "Manage Priorities", href: "/admin/register-user", icon: "⚙️" },
+    { name: "Dashboard Admin", href: "/dashboard/admin", icon: "🏠" },
+    { name: "Manage Users", href: "/dashboard/admin/management-user", icon: "👥" },
+    { name: "Statistik", href: "/dashboard/admin/statistik", icon: "📊" },
+    { name: "Register User", href: "/dashboard/admin/register-user", icon: "📝" },
   ],
   cloud: [
-    { name: "Dashboard Cloud", href: "/cloud", icon: "☁️" },
-    { name: "My Tickets", href: "/cloud/project", icon: "🎫" },
+    { name: "Dashboard Cloud", href: "/dashboard/cloud", icon: "☁️" },
+    { name: "My Tickets", href: "/dashboard/cloud/project", icon: "🎫" },
   ],
   devops: [
-    { name: "Dashboard DevOps", href: "/devops", icon: "🔧" },
-    { name: "My Tickets", href: "/devops/project", icon: "🎫" },
+    { name: "Dashboard DevOps", href: "/dashboard/devops", icon: "🔧" },
+    { name: "My Tickets", href: "/dashboard/devops/project", icon: "🎫" },
   ],
   pm: [
-    { name: "Dashboard PM", href: "/pm", icon: "📊" },
-    { name: "My Tickets", href: "/pm/project", icon: "🎫" },
+    { name: "Dashboard PM", href: "/dashboard/pm", icon: "📊" },
+    { name: "My Tickets", href: "/dashboard/pm/project", icon: "🎫" },
   ],
 };
 
 type User = {
   role: string;
   team?: string;
-  access?: string[]; // optional access to other teams
+  access?: string[];
 };
 
-export default function SidebarAdmin({
-  onToggleWidth,
-}: {
-  onToggleWidth?: (collapsed: boolean) => void;
-}) {
+export default function Sidebar({ onToggleWidth }: { onToggleWidth?: (collapsed: boolean) => void }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(true);
   const [user, setUser] = useState<User | null>(null);
@@ -57,11 +53,9 @@ export default function SidebarAdmin({
       try {
         const res = await fetch("/api/jwt", { credentials: "include" });
         if (!res.ok) return;
-
         const { user } = await res.json();
         setUser(user);
-      } catch (err) {
-      }
+      } catch {}
     };
 
     fetchUser();
@@ -77,12 +71,9 @@ export default function SidebarAdmin({
 
   if (!user) return null;
 
-  const mainMenus =
-    roleBasedMenus[user.role] || roleBasedMenus[user.team ?? ""] || [];
-  const accessMenus =
-    user.access?.flatMap((team) => roleBasedMenus[team] || []) || [];
+  const mainMenus = roleBasedMenus[user.role] || roleBasedMenus[user.team ?? ""] || [];
+  const accessMenus = user.access?.flatMap((team) => roleBasedMenus[team] || []) || [];
 
-  // Gabungkan & hindari duplikat menu berdasarkan href
   const allMenus: MenuItem[] = [];
   const seen = new Set<string>();
   [...mainMenus, ...accessMenus].forEach((menu) => {

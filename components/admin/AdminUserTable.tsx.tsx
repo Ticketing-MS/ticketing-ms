@@ -12,24 +12,14 @@ type User = {
   lastLoginAt?: string;
 };
 
-export default function AdminUserTable() {
+type Props = {
+  currentUserId?: string;
+};
+
+export default function AdminUserTable({ currentUserId }: Props) {
   const [users, setUsers] = useState<User[]>([]);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  // Ambil user dari localStorage
-  useEffect(() => {
-    const raw = localStorage.getItem("user");
-    if (raw) {
-      try {
-        const user = JSON.parse(raw);
-        setCurrentUserId(user?.id ?? null);
-      } catch {
-        setCurrentUserId(null);
-      }
-    }
-  }, []);
-
-  // Polling user list tiap 5 detik
+  // Fetch all users on mount + polling
   useEffect(() => {
     const fetchUsers = () => {
       fetch("/api/admin/users")
@@ -43,7 +33,6 @@ export default function AdminUserTable() {
     return () => clearInterval(interval);
   }, []);
 
-  // Hitung apakah user masih dianggap online (< 1 menit)
   const isUserOnline = (lastLoginAt?: string) => {
     if (!lastLoginAt) return false;
     const last = new Date(lastLoginAt).getTime();

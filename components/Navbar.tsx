@@ -15,16 +15,9 @@ export default function Navbar() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const { theme, toggleTheme } = useTheme();
 
-  const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST" });
-    router.push("/login");
-  };
-
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await fetch("/api/jwt", {
-        credentials: "include",
-      });
+      const res = await fetch("/api/jwt", { credentials: "include" });
       if (!res.ok) return;
       const { user } = await res.json();
       setUserName(user.name || "");
@@ -43,8 +36,7 @@ export default function Navbar() {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -80,23 +72,24 @@ export default function Navbar() {
   };
 
   const getTitle = () => {
-    if (pathname.startsWith("/admin")) {
-      if (pathname === "/admin") return "Dashboard Admin";
-      if (pathname.startsWith("/admin/tiket")) return "Semua Tiket";
-      if (pathname.startsWith("/admin/cloud")) return "Cloud";
-      if (pathname.startsWith("/admin/devops")) return "DevOps";
-      if (pathname.startsWith("/admin/pm")) return "Project Manager";
-      if (pathname.startsWith("/admin/statistik")) return "Statistik & Laporan";
-      if (pathname.startsWith("/admin/management-user"))
-        return "Management User";
-      if (pathname.startsWith("/admin/pengaturan")) return "Pengaturan Sistem";
-      if (pathname.startsWith("/admin/register-user")) return "Register User";
+    if (pathname.startsWith("/dashboard/admin")) {
+      if (pathname === "/dashboard/admin") return "Dashboard Admin";
+      if (pathname.includes("management-user")) return "Manajemen User";
+      if (pathname.includes("register-user")) return "Register User";
+      if (pathname.includes("statistik")) return "Statistik";
       return "Admin Panel";
     }
-    if (pathname.startsWith("/cloud")) return "Cloud Panel";
-    if (pathname.startsWith("/devops")) return "DevOps Panel";
-    if (pathname.startsWith("/pm")) return "PM Panel";
+    if (pathname.startsWith("/dashboard/cloud")) return "Cloud Panel";
+    if (pathname.startsWith("/dashboard/devops")) return "DevOps Panel";
+    if (pathname.startsWith("/dashboard/pm")) return "PM Panel";
+    if (pathname.includes("project")) return "My Tickets";
+    if (pathname.includes("tiket-status")) return "Ticket Status";
     return "Dashboard";
+  };
+
+  const handleLogout = async () => {
+    await fetch("/api/logout", { method: "POST" });
+    router.push("/login");
   };
 
   return (

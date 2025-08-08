@@ -3,40 +3,38 @@ import { users } from "db/schema";
 import { eq } from "drizzle-orm";
 import { compare, hash } from "bcryptjs";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { SignJWT, jwtVerify } from "jose";
 
-const secret = process.env.JWT_SECRET!;
+const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 // ===========================
 // Login
 // ===========================
 export async function loginUser(email: string, password: string) {
-  const user = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email))
-    .then((res) => res[0]);
+  const user = await db.query.users.findFirst({
+    where: eq(users.email, email),
+  });
 
   if (!user || !(await compare(password, user.password))) return null;
   if (!user.isActive) throw new Error("disabled");
 
-  // Update status login
   await db
     .update(users)
-    .set({ isActive: true, lastLoginAt: new Date() })
+    .set({
+      isActive: true,
+      lastLoginAt: new Date(),
+    })
     .where(eq(users.id, user.id));
 
-  // Generate JWT
-  const token = jwt.sign(
-    {
-      id: user.id,
-      name: user.name,
-      role: user.role,
-      team: user.team,
-    },
-    secret,
-    { expiresIn: "7d" }
-  );
+  const token = await new SignJWT({
+    team: user.team,
+    role: user.role,
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("7d")
+    .setSubject(user.id)
+    .sign(secret);
 
   return { token, user };
 }
@@ -49,10 +47,28 @@ export async function getCurrentUser() {
   if (!token) return null;
 
   try {
-    const decoded = jwt.verify(token, secret);
-    if (typeof decoded === "string") return null;
-    return decoded; // contains id, name, role, team
-  } catch {
+    const { payload } = await jwtVerify(token, secret);
+    const userId = payload.sub;
+    if (!userId || typeof userId !== "string") return null;
+
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      // ✅ pastikan semua kolom yang dibutuhkan diambil
+      columns: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        team: true,
+        avatarUrl: true,
+        access: true, // kalau ada kolom JSON array untuk akses PM
+      },
+    });
+
+    if (!user) return null;
+    return user;
+  } catch (err) {
+    console.error("JWT verification error:", err);
     return null;
   }
 }
@@ -84,6 +100,7 @@ export async function registerUser({
   if (existing) throw new Error("User already exists");
 
   const hashedPassword = await hash(password, 10);
+  const defaultAvatar = "/avatarDefault.png";
 
   const [newUser] = await db
     .insert(users)
@@ -94,6 +111,7 @@ export async function registerUser({
       role,
       team,
       isActive: true,
+      avatarUrl: defaultAvatar,
     })
     .returning();
 
@@ -105,13 +123,14 @@ export async function registerUser({
 // ===========================
 export async function updateProfile(
   userId: string,
-  data: { name?: string; email?: string }
+  data: { name?: string; email?: string; avatarUrl?: string }
 ) {
   const [updatedUser] = await db
     .update(users)
     .set({
       name: data.name,
       email: data.email,
+      avatarUrl: data.avatarUrl,
     })
     .where(eq(users.id, userId))
     .returning();
