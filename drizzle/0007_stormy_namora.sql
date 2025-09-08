@@ -1,0 +1,1 @@
+ALTER TABLE "ticket_replies" ADD COLUMN "duration" integer DEFAULT 0 NOT NULL;

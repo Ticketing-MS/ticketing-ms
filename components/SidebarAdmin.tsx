@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import clsx from "clsx";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type MenuItem = {
@@ -18,10 +17,18 @@ type RoleMenuMap = {
 
 const roleBasedMenus: RoleMenuMap = {
   admin: [
-    { name: "Dashboard Admin", href: "/dashboard/admin", icon: "🏠" },
-    { name: "Manage Users", href: "/dashboard/admin/management-user", icon: "👥" },
+    { name: "Dashboard", href: "/dashboard", icon: "🏠" },
+    {
+      name: "Manage Users",
+      href: "/manage-user",
+      icon: "👥",
+    },
     { name: "Statistik", href: "/dashboard/admin/statistik", icon: "📊" },
-    { name: "Register User", href: "/dashboard/admin/register-user", icon: "📝" },
+    {
+      name: "Register User",
+      href: "/dashboard/admin/register-user",
+      icon: "📝",
+    },
   ],
   cloud: [
     { name: "Dashboard Cloud", href: "/dashboard/cloud", icon: "☁️" },
@@ -43,7 +50,11 @@ type User = {
   access?: string[];
 };
 
-export default function Sidebar({ onToggleWidth }: { onToggleWidth?: (collapsed: boolean) => void }) {
+export default function SidebarAdmin({
+  onToggleWidth,
+}: {
+  onToggleWidth?: (collapsed: boolean) => void;
+}) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(true);
   const [user, setUser] = useState<User | null>(null);
@@ -71,8 +82,10 @@ export default function Sidebar({ onToggleWidth }: { onToggleWidth?: (collapsed:
 
   if (!user) return null;
 
-  const mainMenus = roleBasedMenus[user.role] || roleBasedMenus[user.team ?? ""] || [];
-  const accessMenus = user.access?.flatMap((team) => roleBasedMenus[team] || []) || [];
+  const mainMenus =
+    roleBasedMenus[user.role] || roleBasedMenus[user.team ?? ""] || [];
+  const accessMenus =
+    user.access?.flatMap((team) => roleBasedMenus[team] || []) || [];
 
   const allMenus: MenuItem[] = [];
   const seen = new Set<string>();
@@ -85,10 +98,10 @@ export default function Sidebar({ onToggleWidth }: { onToggleWidth?: (collapsed:
 
   return (
     <aside
-      className={clsx(
+      className={[
         "h-screen fixed top-0 left-0 z-50 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-md transition-all duration-300 overflow-y-auto",
-        isOpen ? "w-64" : "w-16"
-      )}
+        isOpen ? "w-64" : "w-16",
+      ].join(" ")}
     >
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
         {isOpen && <span className="text-lg font-semibold">Menu</span>}
@@ -105,13 +118,13 @@ export default function Sidebar({ onToggleWidth }: { onToggleWidth?: (collapsed:
           <Link
             key={item.href}
             href={item.href}
-            className={clsx(
+            className={[
               "flex items-center gap-3 px-4 py-2 rounded-md text-sm font-medium transition-colors",
               pathname === item.href
                 ? "bg-blue-500 text-white"
                 : "text-gray-700 hover:bg-blue-100 dark:text-gray-300 dark:hover:bg-gray-700",
-              !isOpen && "justify-center"
-            )}
+              !isOpen && "justify-center",
+            ].join(" ")}
           >
             <span>{item.icon || "📁"}</span>
             {isOpen && <span>{item.name}</span>}

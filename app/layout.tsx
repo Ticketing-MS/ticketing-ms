@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
-import { ThemeProvider } from "components/theme-provider";
+import { ThemeProvider } from "hooks/context/ThemeContext";
 
 const geistSans = Inter({
   variable: "--font-geist-sans",
@@ -25,15 +25,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full w-full">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full w-full bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
-      >
-        <ThemeProvider>
+    <ThemeProvider>
+      <html lang="en" className="h-full w-full">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased h-full w-full bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
+        >
           {children}
           <Toaster richColors position="top-right" />
-        </ThemeProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ThemeProvider>
   );
 }
