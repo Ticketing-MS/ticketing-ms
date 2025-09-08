@@ -66,10 +66,13 @@ export async function refreshToken(
       refreshToken: await hashing(refreshToken),
       expiresAt: authUser[0].expiresAt,
       userAgent: req.headers.get("user-agent"),
-      ip: req.headers.get("x-forwarded-for"),
+      ip:
+        req.headers.get("x-forwarded-for") === "::1"
+          ? "127.0.0.1"
+          : req.headers.get("x-forwarded-for"),
       deviceId: authUser[0].deviceId,
     });
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, deviceId: authUser[0].deviceId };
   }
 }

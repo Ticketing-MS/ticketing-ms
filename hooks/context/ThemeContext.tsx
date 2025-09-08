@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, createContext, useContext } from "react";
-import { getCookie, setCookie } from "cookies-next";
+import { setCookie } from "cookies-next";
 
 type Theme = "light" | "dark";
 
@@ -16,7 +16,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    const stored = getCookie("theme") as Theme;
+    const stored = localStorage.getItem("theme") as Theme;
     if (stored) {
       setTheme(stored);
       document.documentElement.classList.toggle("dark", stored === "dark");
@@ -27,7 +27,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const toggleTheme = () => {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
-    setCookie("theme", next);
+
+    localStorage.setItem("theme", next);
     document.documentElement.classList.toggle("dark", next === "dark");
   };
 

@@ -27,6 +27,14 @@ async function postHandler(req: Request): Promise<NextResponse> {
     maxAge: age, // 7 hari
   });
 
+  cookies().set("deviceId", result.deviceId, {
+    httpOnly: true,
+    path: "/",
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: age, // 7 hari
+  });
+
   return NextResponse.json({
     status: "success",
     message: "Token refreshed successfully",

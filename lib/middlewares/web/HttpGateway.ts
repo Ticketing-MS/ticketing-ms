@@ -1,3 +1,7 @@
+"use client";
+
+import { toast } from "sonner";
+
 type ResponseData = {
   status: string;
   message: string;
@@ -36,7 +40,16 @@ export default class HttpGateway {
   };
 
   static httpRefreshToken = async () => {
-    HttpGateway.requestJson("POST", "/api/auth/refresh");
+    const { status } = await HttpGateway.requestJson(
+      "POST",
+      "/api/auth/refresh",
+      "{}"
+    );
+
+    if (status === 401) {
+      toast.error("Unauthenticated, please sign in again");
+      return window.location.replace("/login");
+    }
   };
 
   static httpGet = async (url: string) => {
