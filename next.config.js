@@ -2,6 +2,7 @@
 const nextConfig = {
   productionBrowserSourceMaps: false,
   swcMinify: true,
+  reactStrictMode: false,
 
   async redirects() {
     return [
