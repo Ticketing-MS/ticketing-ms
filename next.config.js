@@ -3,6 +3,10 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   swcMinify: true,
   reactStrictMode: false,
+  eslint: {
+    ignoreDuringBuilds: false,
+    dirs: ["app", "components", "lib", "config", "hooks"],
+  },
 
   async redirects() {
     return [
