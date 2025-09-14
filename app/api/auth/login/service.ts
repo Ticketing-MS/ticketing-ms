@@ -1,5 +1,5 @@
 import { db } from "config/db";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { AuthUser, getTeamByUserId, User } from "lib/db/models";
 import { authUsers, users } from "lib/db/schemas";
 import { hashing, verifyHash } from "lib/utils/hashing";
@@ -44,20 +44,23 @@ export async function login(
     req.headers.get("x-forwarded-for")?.toString() ?? "";
 
   if (deviceId) {
-    const authDevices: AuthUser[] = await db.query.authUsers.findMany({
-      where: and(
-        eq(authUsers.deviceId, deviceId),
-        eq(authUsers.userId, user.id)
-      ),
-    });
-
-    // verify device has same user agent
-    const verifiedDevice: boolean = authDevices.some(
-      (auth) => userAgent === auth.userAgent
+    const authDevice: AuthUser | undefined = await db.query.authUsers.findFirst(
+      {
+        where: and(
+          eq(authUsers.deviceId, deviceId),
+          eq(authUsers.userId, user.id)
+        ),
+        orderBy: [desc(authUsers.createdAt)],
+      }
     );
 
-    if (authDevices.length > 0 && !verifiedDevice) {
-      throw new APIAuthenticationError();
+    if (authDevice) {
+      // verify device has same user agent
+      const verifiedDevice: boolean = authDevice.userAgent === userAgent;
+
+      if (!verifiedDevice) {
+        throw new APIAuthenticationError();
+      }
     }
   } else {
     // generate new device id
