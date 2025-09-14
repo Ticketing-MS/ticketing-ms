@@ -1,6 +1,6 @@
 # 🚀 Next.js Project Documentation
 
-Aplikasi ini dibangun menggunakan **Next.js** dengan dukungan **Node.js versi >= 18.17**.  
+Aplikasi ini dibangun menggunakan **Next.js** dengan dukungan **Node.js versi >= 20**.  
 Dokumentasi ini memberikan gambaran umum tentang cara memulai, struktur project, serta beberapa detail kasus yang sering ditemui.
 
 ---
@@ -16,7 +16,7 @@ Dokumentasi ini memberikan gambaran umum tentang cara memulai, struktur project,
 
 ### Prerequisite
 
-- **Node.js** `>= 18.17`
+- **Node.js** `>= 20`
 - **npm** atau **yarn** package manager
 
 ### Installation
@@ -103,4 +103,22 @@ project-name/
 ├── tsconfig.json                   # Konfigurasi typescript
 └── README.md                       # Dokumentasi
 
+```
+
+### Before Push
+
+1. Check linter
+
+```
+npm run lint
+# or
+yarn run lint
+```
+
+2. Push to github
+
+```
+git add .
+git commit -m "<message>"
+git push
 ```
