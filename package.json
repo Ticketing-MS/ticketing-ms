@@ -18,7 +18,7 @@
     "@neondatabase/serverless": "^0.10.4",
     "@uiw/react-markdown-preview": "^5.1.5",
     "@uiw/react-md-editor": "^4.0.8",
-    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
     "cookies-next": "^4.3.0",
     "date-fns": "^4.1.0",
@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.9.0",
-    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^18",
