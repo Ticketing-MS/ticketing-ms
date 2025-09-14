@@ -1,6 +1,6 @@
-import { Role } from "lib/db/models";
+import { Role, Team } from "lib/db/models";
 
-export interface LoginData {
+export interface LoginPayload {
   email: string;
   password: string;
 }
@@ -19,4 +19,5 @@ export interface LoginResponse {
     refreshToken: string;
     deviceId: string;
   };
+  teams: Team[];
 }

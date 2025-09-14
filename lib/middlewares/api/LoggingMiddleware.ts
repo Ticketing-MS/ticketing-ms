@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "../../../config/winston";
-import { v4 as uuidV4 } from "uuid";
 import "dotenv/config";
+import { File } from "buffer";
 
 function masking(data: Record<string, any>): string {
   const maskingProps: string[] = process.env
@@ -12,6 +12,8 @@ function masking(data: Record<string, any>): string {
   for (const [key, value] of Object.entries(data)) {
     if (Array.isArray(value)) {
       data[key] = "[...]";
+    } else if (value instanceof File) {
+      data[key] = "File {...}";
     } else if (typeof value === "object") {
       data[key] = "{...}";
     } else if (maskingProps.some((prop) => prop === key)) {
@@ -33,15 +35,24 @@ export function handlingLogging(
     const response = await handler(req);
     const cloneResponse = response.clone();
 
-    const rawRequest = await cloneRequest.text();
-    let requestJson = {};
+    let requestData: Record<string, any> = {};
 
     if (
       cloneRequest.body &&
       req.headers.get("Content-Type")?.includes("application/json")
     ) {
-      requestJson = JSON.parse(rawRequest);
+      const rawRequest = await cloneRequest.text();
+      requestData = JSON.parse(rawRequest);
+    } else if (
+      cloneRequest.body &&
+      req.headers.get("Content-Type")?.includes("multipart/form-data;")
+    ) {
+      const rawRequest = await cloneRequest.formData();
+      for (const [key, value] of rawRequest.entries()) {
+        requestData[key] = value;
+      }
     }
+
     const responseJson = await cloneResponse.json();
 
     logger.info({
@@ -49,7 +60,7 @@ export function handlingLogging(
       method: req.method,
       path: req.nextUrl.pathname,
       requestId: req.headers.get("x-request-id"),
-      body: masking(requestJson),
+      body: masking(requestData),
       params: req.nextUrl.searchParams,
     });
 

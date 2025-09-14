@@ -50,7 +50,8 @@ export default function Navbar() {
     );
 
     if (status === 200) {
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
+      sessionStorage.removeItem("nextRefresh");
       toast.success(data.message);
       router.replace("/login");
     } else {

@@ -14,7 +14,7 @@ const nextConfig = {
         source:
           "/:path((?!login|_next/static|_next/image|api|favicon\\.ico|robots\\.txt|sitemap\\.xml).*)", // URL asal
         destination: "/login", // diarahkan ke sini
-        permanent: true, // 308 redirect (search engine-friendly)
+        permanent: false, // 308 redirect (search engine-friendly)
         missing: [
           {
             type: "cookie",
@@ -27,8 +27,7 @@ const nextConfig = {
         ],
       },
       {
-        source:
-          "/:path((?!dashboard|_next/static|_next/image|api|favicon\\.ico).*)", // URL asal
+        source: "/login", // URL asal
         destination: "/dashboard", // diarahkan ke sini
         permanent: false,
         has: [

@@ -3,14 +3,15 @@
 interface TextInputProps {
   name: string;
   label: string;
-  type: string;
+  type?: string;
   error: boolean;
   touched: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur: (e: React.ChangeEvent<HTMLInputElement>) => void;
   autoComplete?: string;
   helperText?: string;
-  value: string;
+  value?: string; // optional to support file input
+  className?: string;
 }
 
 export default function TextInput({
@@ -24,11 +25,13 @@ export default function TextInput({
   autoComplete,
   helperText,
   value,
+  className = "",
 }: TextInputProps) {
   return (
     <>
       <input
         type={type}
+        id={name}
         name={name}
         placeholder={label}
         className={[
@@ -36,6 +39,7 @@ export default function TextInput({
           error && touched
             ? "border-red-500 ring-2 ring-red-500 focus:ring-red-500"
             : "focus:ring-cyan-400",
+          className,
         ].join(" ")}
         value={value}
         onChange={onChange}

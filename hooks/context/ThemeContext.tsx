@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, createContext, useContext } from "react";
-import { setCookie } from "cookies-next";
 
 type Theme = "light" | "dark";
 

@@ -10,7 +10,6 @@ async function postHandler(req: Request): Promise<NextResponse> {
 
   cookies().delete("accessToken");
   cookies().delete("refreshToken");
-  cookies().delete("deviceId");
 
   return NextResponse.json({
     status: "success",

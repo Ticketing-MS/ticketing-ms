@@ -1,7 +1,7 @@
 import { validateAPI } from "lib/utils/validation";
 import { postSchema } from "./validation";
 import { NextResponse } from "next/server";
-import { LoginData } from "./dto";
+import { LoginPayload } from "./dto";
 import { login } from "./service";
 import { handlingError } from "lib/middlewares/api/ErrorMiddleware";
 import { handlingLogging } from "lib/middlewares/api/LoggingMiddleware";
@@ -9,7 +9,7 @@ import { cookies } from "next/headers";
 
 async function postHandler(req: Request): Promise<NextResponse> {
   const payload = await req.json();
-  const validated: LoginData = validateAPI(postSchema, payload);
+  const validated: LoginPayload = validateAPI(postSchema, payload);
 
   const result = await login(req, validated);
 
@@ -22,14 +22,12 @@ async function postHandler(req: Request): Promise<NextResponse> {
       maxAge: 60 * 15, // 15 menit
     });
 
-    const age = 60 * 60 * 24 * 7;
-
     cookies().set("refreshToken", result.auth.refreshToken, {
       httpOnly: true,
       path: "/",
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: age, // 7 hari
+      maxAge: 60 * 60 * 24 * 7, // 7 hari
     });
 
     cookies().set("deviceId", result.auth.deviceId, {
@@ -37,7 +35,7 @@ async function postHandler(req: Request): Promise<NextResponse> {
       path: "/",
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: age, // 7 hari
+      maxAge: 60 * 60 * 24 * 365, // 1 tahun
     });
 
     delete result.auth;

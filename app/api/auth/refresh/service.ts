@@ -1,18 +1,16 @@
 import { db } from "config/db";
 import { and, desc, eq, isNull } from "drizzle-orm";
-import { AuthUser, User } from "lib/db/models";
+import { AuthUser } from "lib/db/models";
 import { authUsers } from "lib/db/schemas";
 import { APIAuthenticationError } from "lib/errors/api/APIAuthenticationError";
-import { APIServerError } from "lib/errors/api/APIServerError";
 import { hashing, verifyHash } from "lib/utils/hashing";
 import { createAccessToken, createRefreshToken } from "lib/utils/tokenize";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 
 export async function refreshToken(
   req: Request
 ): Promise<Record<string, string>> {
-  const deviceId = cookies().get("deviceId")?.value ?? "";
+  const deviceId: string = cookies().get("deviceId")?.value ?? "";
 
   // get auth user by device id
   const authUser: AuthUser[] = await db.query.authUsers.findMany({
@@ -23,23 +21,21 @@ export async function refreshToken(
   // if there are not recognized deviceId
   if (authUser.length === 0) {
     cookies().delete("refreshToken");
-    cookies().delete("deviceId");
     throw new APIAuthenticationError();
   } else if (authUser[0].revokedAt !== null) {
-    // verify deviceId with this refresh token has not logged out
+    // verify device id with new refresh token haven't logout
     cookies().delete("refreshToken");
-    cookies().delete("deviceId");
-
     throw new APIAuthenticationError();
   } else {
     // verify refresh token with new record
-    const verified = await verifyHash(
+    const verified: boolean = await verifyHash(
       cookies().get("refreshToken")?.value ?? "",
       authUser[0].refreshToken
     );
 
-    if (!verified) {
-      // force logout all device with this deviceId
+    // if unverified or expired
+    if (!verified || authUser[0].expiresAt < new Date()) {
+      // force logout with this device id
       await db
         .update(authUsers)
         .set({ revokedAt: new Date(), updatedAt: new Date() })
@@ -48,14 +44,15 @@ export async function refreshToken(
         );
 
       cookies().delete("refreshToken");
-      cookies().delete("deviceId");
-
       throw new APIAuthenticationError();
     }
 
     // create new token and update to database
-    const accessToken = await createAccessToken(authUser[0].userId);
-    const refreshToken = createRefreshToken();
+    const accessToken: string = await createAccessToken(
+      authUser[0].userId,
+      deviceId
+    );
+    const refreshToken: string = createRefreshToken();
 
     await db
       .update(authUsers)
@@ -66,10 +63,7 @@ export async function refreshToken(
       refreshToken: await hashing(refreshToken),
       expiresAt: authUser[0].expiresAt,
       userAgent: req.headers.get("user-agent"),
-      ip:
-        req.headers.get("x-forwarded-for") === "::1"
-          ? "127.0.0.1"
-          : req.headers.get("x-forwarded-for"),
+      ip: req.headers.get("x-forwarded-for"),
       deviceId: authUser[0].deviceId,
     });
 

@@ -20,8 +20,11 @@ function getSecret() {
   return new TextEncoder().encode(process.env.JWT_SECRET as string);
 }
 
-export async function createAccessToken(userId: string): Promise<string> {
-  return await new SignJWT({ userId })
+export async function createAccessToken(
+  userId: string,
+  deviceId: string
+): Promise<string> {
+  return await new SignJWT({ userId, deviceId })
     .setProtectedHeader({ alg: "HS512" })
     .setExpirationTime("15m")
     .setIssuedAt(new Date())

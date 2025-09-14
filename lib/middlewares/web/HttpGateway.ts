@@ -1,6 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
+import { getCookie } from "cookies-next";
 
 type ResponseData = {
   status: string;
@@ -15,6 +16,47 @@ export interface ApiResponse {
 }
 
 export default class HttpGateway {
+  static requestFormData = async (
+    method: string,
+    url: string,
+    body: any,
+    headers?: Record<string, string>
+  ) => {
+    let responseJson = {
+      status: "",
+      message: "",
+    };
+
+    const formData = new FormData();
+
+    for (const [key, value] of Object.entries(body)) {
+      // console.log(`key: ${key}, value: ${value}`);
+      if (value instanceof File) {
+        // jika File, ikutkan nama file
+        formData.append(key, value instanceof File ? value : value);
+      } else if (typeof value === "object") {
+        // objek biasa -> JSON string
+        formData.append(key, JSON.stringify(value));
+      } else {
+        formData.append(key, String(value));
+      }
+    }
+
+    const response = await fetch(url, {
+      method,
+      body: formData,
+      headers: {
+        ...headers,
+      },
+    });
+
+    if (response.headers.get("Content-Type")?.includes("application/json")) {
+      responseJson = (await response.json()) as ResponseData;
+    }
+
+    return { status: response.status, data: responseJson };
+  };
+
   static requestJson = async (
     method: string,
     url: string,
@@ -29,7 +71,10 @@ export default class HttpGateway {
     const response = await fetch(url, {
       method,
       body,
-      headers: { "Content-Type": "application/json", ...headers },
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
     });
 
     if (response.headers.get("Content-Type")?.includes("application/json")) {
@@ -40,6 +85,32 @@ export default class HttpGateway {
   };
 
   static httpRefreshToken = async () => {
+    const dateToRefresh: string | null = sessionStorage.getItem("nextRefresh");
+
+    if (dateToRefresh && new Date(dateToRefresh) > new Date()) {
+      // wait until first request get the response from server
+      return new Promise((resolve) => {
+        let timeout: any;
+        const timer = setInterval(() => {
+          if (getCookie("accessToken")) {
+            clearInterval(timer);
+            clearTimeout(timeout);
+            return resolve(true);
+          }
+        }, 1000);
+
+        timeout = setTimeout(() => {
+          clearInterval(timer);
+          return resolve(true);
+        }, 10000);
+      });
+    }
+
+    sessionStorage.setItem(
+      "nextRefresh",
+      new Date(new Date().getTime() + 60 * 15 * 1000).toString()
+    );
+
     const { status } = await HttpGateway.requestJson(
       "POST",
       "/api/auth/refresh",
@@ -48,6 +119,8 @@ export default class HttpGateway {
 
     if (status === 401) {
       toast.error("Unauthenticated, please sign in again");
+      sessionStorage.removeItem("nextRefresh");
+      sessionStorage.removeItem("user");
       return window.location.replace("/login");
     }
   };
@@ -135,6 +208,44 @@ export default class HttpGateway {
     if (status === 401) {
       await HttpGateway.httpRefreshToken();
       const { status, data } = await HttpGateway.requestJson("DELETE", url);
+    }
+
+    return { status, data };
+  };
+
+  static secureHttpPostForm = async (url: string, body: any) => {
+    const { status, data } = await HttpGateway.requestFormData(
+      "POST",
+      url,
+      body
+    );
+
+    if (status === 401) {
+      await HttpGateway.httpRefreshToken();
+      const { status, data } = await HttpGateway.requestFormData(
+        "POST",
+        url,
+        body
+      );
+    }
+
+    return { status, data };
+  };
+
+  static secureHttpPutForm = async (url: string, body: any) => {
+    const { status, data } = await HttpGateway.requestFormData(
+      "PUT",
+      url,
+      body
+    );
+
+    if (status === 401) {
+      await HttpGateway.httpRefreshToken();
+      const { status, data } = await HttpGateway.requestFormData(
+        "POST",
+        url,
+        body
+      );
     }
 
     return { status, data };

@@ -12,4 +12,6 @@ const pool = new Pool({
   connectionTimeoutMillis: 5000,
 });
 
-export const db = drizzle({ client: pool, schema: schemas }); // <-- tambahkan schema di sini
+const isLogger = process.env.NODE_ENV === "production";
+
+export const db = drizzle({ client: pool, schema: schemas, logger: !isLogger }); // <-- tambahkan schema di sini

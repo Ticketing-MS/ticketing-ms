@@ -1,0 +1,1 @@
+ALTER TABLE "tickets" ADD COLUMN "is_task" boolean DEFAULT false NOT NULL;

@@ -5,6 +5,7 @@ import {
   varchar,
   uuid,
   integer,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { users } from "./1756795931_users";
 import { projects } from "./1756796090_projects";
@@ -40,8 +41,8 @@ export const tickets = pgTable("tickets", {
   referenceCode: varchar("reference_code", { length: 5 }).notNull(),
   startDate: timestamp("start_date"),
   dueDate: timestamp("due_date"),
-  // labels: text("labels").array().default([]),
   order: integer("order").notNull(),
+  isTask: boolean("is_task").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

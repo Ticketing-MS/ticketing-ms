@@ -1,29 +1,28 @@
-import { LoginResponse } from "app/api/auth/login/dto";
 import { db } from "config/db";
-import { logger } from "config/winston";
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { AuthUser, User } from "lib/db/models";
-import { authUsers, users } from "lib/db/schemas";
+import { authUsers } from "lib/db/schemas";
 import { APIAuthenticationError } from "lib/errors/api/APIAuthenticationError";
 import { APIServerError } from "lib/errors/api/APIServerError";
 import { cookies } from "next/headers";
 
 export async function logout(req: Request): Promise<void> {
-  const requestUser = req.headers.get("user");
+  // get user data
+  const requestUser: string | null = req.headers.get("user");
   if (!requestUser) throw new APIServerError();
-
   const userData: User = JSON.parse(requestUser);
 
   // get auth user
-  const authUser: AuthUser | undefined = await db.query.authUsers.findFirst({
+  const deviceId: string = cookies().get("deviceId")?.value ?? "";
+  const authUser: AuthUser[] = await db.query.authUsers.findMany({
     where: and(
       eq(authUsers.userId, userData.id),
-      eq(authUsers.deviceId, cookies().get("deviceId")?.value ?? "")
+      eq(authUsers.deviceId, deviceId ?? ""),
+      isNull(authUsers.revokedAt)
     ),
-    orderBy: [desc(authUsers.createdAt)],
   });
 
-  if (!authUser) {
+  if (authUser.length === 0) {
     throw new APIAuthenticationError();
   }
 
@@ -31,5 +30,11 @@ export async function logout(req: Request): Promise<void> {
   await db
     .update(authUsers)
     .set({ revokedAt: new Date(), updatedAt: new Date() })
-    .where(eq(authUsers.id, authUser.id));
+    .where(
+      and(
+        eq(authUsers.deviceId, deviceId ?? ""),
+        isNull(authUsers.revokedAt),
+        eq(authUsers.userId, userData.id)
+      )
+    );
 }

@@ -2,21 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "hooks/context/ThemeContext";
-import Validation from "./_validation";
+import LoginValidation from "./_validation";
 import TextInput from "components/forminput/TextInput";
 import { PulseLoader } from "react-spinners";
 import { toast } from "sonner";
 import ToggleTheme from "components/ToggleTheme";
 import Button from "components/forminput/Button";
-import { LogIn } from "lucide-react";
+import { Eye, EyeClosed, LogIn } from "lucide-react";
 import HttpGateway from "lib/middlewares/web/HttpGateway";
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const { theme } = useTheme();
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const onSubmit = async () => {
     setIsLoading(true);
@@ -30,7 +32,7 @@ export default function LoginPage() {
 
     if (status === 200) {
       toast.success(data.message);
-      localStorage.setItem("user", JSON.stringify(data.data));
+      sessionStorage.setItem("user", JSON.stringify(data.data));
       router.replace("/dashboard");
     } else {
       toast.error(data.message);
@@ -38,7 +40,7 @@ export default function LoginPage() {
   };
 
   const { values, errors, touched, handleChange, handleSubmit, handleBlur } =
-    Validation(onSubmit);
+    LoginValidation(onSubmit);
 
   return (
     <div className="relative min-h-screen items-center justify-center bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 flex">
@@ -67,26 +69,32 @@ export default function LoginPage() {
                 helperText={errors.email}
               />
 
-              <TextInput
-                type="password"
-                name="password"
-                label="Password"
-                value={values.password}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={Boolean(errors.password)}
-                touched={Boolean(touched.password)}
-                autoComplete="password"
-                helperText={errors.password}
-              />
+              <div className="relative">
+                <TextInput
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  label="Password"
+                  value={values.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={Boolean(errors.password)}
+                  touched={Boolean(touched.password)}
+                  autoComplete="password"
+                  helperText={errors.password}
+                />
+                <button
+                  onClick={toggleShowPassword}
+                  type="button"
+                  className="absolute right-5 top-4 text-gray-500 dark:text-gray-300"
+                >
+                  {showPassword ? <EyeClosed size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
 
               <Button type="submit" isDisabled={isLoading}>
                 {isLoading ? (
                   <div className="h-6 p-1">
-                    <PulseLoader
-                      color={theme === "light" ? "#fff" : "#525252ff"}
-                      size={10}
-                    />
+                    <PulseLoader color="#36d7b7" size={10} />
                   </div>
                 ) : (
                   <>

@@ -8,8 +8,8 @@ export interface Ticket {
   referenceCode: string;
   startDate: Date | null;
   dueDate: Date | null;
-  // labels: string[];
   order: number;
+  isTask: boolean;
   createdAt: Date | null;
   updatedAt: Date | null;
 }

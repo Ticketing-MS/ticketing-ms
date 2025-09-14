@@ -24,14 +24,17 @@ export const UserLogInProvider = ({
   const [userLogIn, setUserLogIn] = useState<User>();
 
   const fetchUser = async () => {
-    const { data } = await HttpGateway.secureHttpGet("/api/auth/me");
+    const { status, data } = await HttpGateway.secureHttpGet("/api/auth/me");
     const user: User = data.data;
     setUserLogIn(user);
-    localStorage.setItem("user", JSON.stringify(user));
+
+    if (status === 200) {
+      sessionStorage.setItem("user", JSON.stringify(user));
+    }
   };
 
   const changeUserLogIn = async () => {
-    const userData = localStorage.getItem("user");
+    const userData = sessionStorage.getItem("user");
     if (!userData) {
       fetchUser();
     } else {
