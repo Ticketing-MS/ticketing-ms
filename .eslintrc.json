@@ -1,0 +1,21 @@
+{
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "@next/next/no-img-element": "off",
+    "@typescript-eslint/no-explicit-any": "off"
+  }
+
+  // "parserOptions": {
+  //   "sourceType": "module",
+  //   "ecmaVersion": 2024
+  // }
+
+  // "overrides": [
+  //   {
+  //     "files": ["*.js", "*.jsx", "*.ts", "*.tsx"],
+  //     "linterOptions": {
+  //       "reportUnusedDisableDirectives": true
+  //     }
+  //   }
+  // ]
+}

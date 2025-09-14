@@ -7,9 +7,7 @@ import { APIAuthenticationError } from "lib/errors/api/APIAuthenticationError";
 import { APIServerError } from "lib/errors/api/APIServerError";
 import { UpdateProfilePayload } from "./dto";
 import cloudinary from "config/cloudinary";
-import { APIResponseError } from "lib/errors/api/APIResponseError";
 import { APIValidationError } from "lib/errors/api/APIValidationError";
-import { logger } from "config/winston";
 
 export async function getProfile(req: Request): Promise<LoginResponse> {
   // get data user

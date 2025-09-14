@@ -1,5 +1,3 @@
-import { NextResponse } from "next/server";
-
 export class APIResponseError extends Error {
   public status: number;
   public errors?: Record<string, string>;

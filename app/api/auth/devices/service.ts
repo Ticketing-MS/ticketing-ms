@@ -5,7 +5,6 @@ import { authUsers } from "lib/db/schemas";
 import { DeviceData } from "./dto";
 import { UAParser } from "ua-parser-js";
 import { APIServerError } from "lib/errors/api/APIServerError";
-import { create } from "domain";
 
 export async function getDevices(req: Request): Promise<DeviceData[]> {
   // get data user

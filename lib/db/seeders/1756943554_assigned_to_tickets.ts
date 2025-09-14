@@ -8,7 +8,7 @@ export async function up() {
   const ticketsData: Ticket[] = await db.select().from(tickets);
   const data: any[] = [];
 
-  for (let ticket of ticketsData) {
+  for (const ticket of ticketsData) {
     const filtered = usersData.filter((user) =>
       user.assignedProjects?.some((project) => project.id === ticket.projectId)
     );

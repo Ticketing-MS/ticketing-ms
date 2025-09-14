@@ -1,4 +1,3 @@
-import { logger } from "config/winston";
 import { SignJWT, jwtVerify } from "jose";
 
 interface TokenPayload {

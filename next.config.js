@@ -7,6 +7,14 @@ const nextConfig = {
     ignoreDuringBuilds: false,
     dirs: ["app", "components", "lib", "config", "hooks"],
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
+  },
 
   async redirects() {
     return [

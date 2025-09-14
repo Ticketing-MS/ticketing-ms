@@ -7,7 +7,6 @@ import { validateAPI } from "lib/utils/validation";
 import { putSchema } from "./validation";
 import { UpdateProfilePayload } from "./dto";
 import { LoginResponse } from "../login/dto";
-import { logger } from "config/winston";
 
 async function getHandler(req: Request): Promise<NextResponse> {
   const result: LoginResponse = await getProfile(req);

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { UpdatePasswordValidation } from "../_validation";
 import { useState } from "react";
 import TextInput from "components/forminput/TextInput";
-import { Eye, EyeClosed, LogIn, SendIcon } from "lucide-react";
+import { Eye, EyeClosed, SendIcon } from "lucide-react";
 import Button from "components/forminput/Button";
 import { PulseLoader } from "react-spinners";
 import HttpGateway from "lib/middlewares/web/HttpGateway";
@@ -28,7 +28,10 @@ export default function UpdatePassword() {
 
     if (status === 200) {
       toast.success(data.message);
-      values.logoutAllDevices && router.replace("/login");
+
+      if (values.logoutAllDevices) {
+        router.replace("/login");
+      }
     } else {
       toast.error(data.message);
     }

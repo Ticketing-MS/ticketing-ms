@@ -90,7 +90,7 @@ export default class HttpGateway {
     if (dateToRefresh && new Date(dateToRefresh) > new Date()) {
       // wait until first request get the response from server
       return new Promise((resolve) => {
-        let timeout: any;
+        let timeout: any = null;
         const timer = setInterval(() => {
           if (getCookie("accessToken")) {
             clearInterval(timer);
@@ -208,6 +208,7 @@ export default class HttpGateway {
     if (status === 401) {
       await HttpGateway.httpRefreshToken();
       const { status, data } = await HttpGateway.requestJson("DELETE", url);
+      return { status, data };
     }
 
     return { status, data };
@@ -227,6 +228,7 @@ export default class HttpGateway {
         url,
         body
       );
+      return { status, data };
     }
 
     return { status, data };
@@ -246,6 +248,7 @@ export default class HttpGateway {
         url,
         body
       );
+      return { status, data };
     }
 
     return { status, data };

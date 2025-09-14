@@ -1,5 +1,5 @@
 import { db } from "config/db";
-import { and, eq } from "drizzle-orm";
+import { and } from "drizzle-orm";
 import { usersToTeams } from "../schemas";
 
 export interface Team {

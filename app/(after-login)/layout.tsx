@@ -16,7 +16,7 @@ export default function DashboardLayout({
       {pathname === "/profile" ? (
         children
       ) : (
-        <BaseDashboardLayout children={children} />
+        <BaseDashboardLayout>{children}</BaseDashboardLayout>
       )}
     </UserLogInProvider>
   );

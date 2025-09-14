@@ -1,6 +1,5 @@
 "use client";
 
-import { logout } from "app/api/auth/logout/service";
 import { useFormik } from "formik";
 import { useUserLogIn } from "hooks/context/UserLogInContext";
 import * as yup from "yup";
