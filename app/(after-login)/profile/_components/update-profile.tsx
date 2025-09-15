@@ -9,7 +9,11 @@ import HttpGateway from "lib/middlewares/web/HttpGateway";
 import { useUserLogIn } from "hooks/context/UserLogInContext";
 import { toast } from "sonner";
 
-export default function UpdateProfile() {
+export default function UpdateProfile({
+  changeTab,
+}: {
+  changeTab: () => void;
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const { changeUserLogIn } = useUserLogIn();
 
@@ -24,8 +28,14 @@ export default function UpdateProfile() {
       sessionStorage.removeItem("user");
       toast.success(data.message);
       changeUserLogIn();
+      changeTab();
     } else {
-      toast.error(data.message);
+      toast.error(data.message, {
+        description: Object.entries(data.errors)
+          .map((error) => error[1])
+          .concat()
+          .toString(),
+      });
     }
 
     setIsLoading(false);

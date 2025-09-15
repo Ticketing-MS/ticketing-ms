@@ -19,6 +19,11 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: "/",
+        destination: "/login",
+        permanent: false,
+      },
+      {
         source:
           "/:path((?!login|_next/static|_next/image|api|favicon\\.ico|robots\\.txt|sitemap\\.xml).*)", // URL asal
         destination: "/login", // diarahkan ke sini
@@ -39,10 +44,10 @@ const nextConfig = {
         destination: "/dashboard", // diarahkan ke sini
         permanent: false,
         has: [
-          {
-            type: "cookie",
-            key: "accessToken",
-          },
+          // {
+          //   type: "cookie",
+          //   key: "accessToken",
+          // },
           {
             type: "cookie",
             key: "refreshToken",

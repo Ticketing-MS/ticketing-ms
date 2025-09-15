@@ -59,7 +59,7 @@ export function UpdatePasswordValidation(handler: any) {
         currentPassword: "",
         newPassword: "",
         confirmNewPassword: "",
-        logoutAllDevices: "false",
+        logoutAllDevices: false,
       },
       validationSchema: yup
         .object()

@@ -21,7 +21,7 @@ export default class HttpGateway {
     url: string,
     body: any,
     headers?: Record<string, string>
-  ) => {
+  ): Promise<ApiResponse> => {
     let responseJson = {
       status: "",
       message: "",

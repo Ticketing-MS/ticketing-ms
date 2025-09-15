@@ -46,7 +46,6 @@ export default function Devices() {
                   {device.userAgent.os?.version} (
                   {device.userAgent.browser?.name ?? "unknown"})
                 </p>
-                <p className="text-sm">{device.ipAddress}</p>
                 <p className="text-sm mt-2">
                   {device.createdAt &&
                     formatRelative(device.createdAt, new Date())}

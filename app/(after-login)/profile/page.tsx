@@ -77,9 +77,9 @@ export default function ProfilePage() {
                   <Devices />
                 </>
               ) : activeTab === "editProfile" ? (
-                <UpdateProfile />
+                <UpdateProfile changeTab={() => setActiveTab("info")} />
               ) : (
-                <UpdatePassword />
+                <UpdatePassword changeTab={() => setActiveTab("info")} />
               )}
             </AnimatePresence>
           </div>

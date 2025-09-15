@@ -16,7 +16,6 @@ export async function getDevices(req: Request): Promise<DeviceData[]> {
     .selectDistinctOn([authUsers.deviceId], {
       id: authUsers.id,
       deviceId: authUsers.deviceId,
-      ipAddress: authUsers.ip,
       userAgent: authUsers.userAgent,
       createdAt: authUsers.createdAt,
     })
@@ -37,7 +36,6 @@ export async function getDevices(req: Request): Promise<DeviceData[]> {
     devices.push({
       id: auth.id,
       deviceId: auth.deviceId,
-      ipAddress: auth.ipAddress,
       userAgent: {
         browser: parser.getBrowser(),
         os: parser.getOS(),

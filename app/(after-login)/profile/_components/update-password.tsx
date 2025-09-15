@@ -9,7 +9,11 @@ import HttpGateway from "lib/middlewares/web/HttpGateway";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export default function UpdatePassword() {
+export default function UpdatePassword({
+  changeTab,
+}: {
+  changeTab: () => void;
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState({
     currentPassword: false,
@@ -29,11 +33,18 @@ export default function UpdatePassword() {
     if (status === 200) {
       toast.success(data.message);
 
-      if (values.logoutAllDevices) {
+      if (Boolean(values.logoutAllDevices)) {
         router.replace("/login");
+      } else {
+        changeTab();
       }
     } else {
-      toast.error(data.message);
+      toast.error(data.message, {
+        description: Object.entries(data.errors)
+          .map((error) => error[1])
+          .concat()
+          .toString(),
+      });
     }
 
     setIsLoading(false);
@@ -169,7 +180,7 @@ export default function UpdatePassword() {
             type="checkbox"
             name="logoutAllDevices"
             id="logoutAllDevices"
-            value={values.logoutAllDevices}
+            checked={Boolean(values.logoutAllDevices)}
             onChange={handleChange}
             className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
           />

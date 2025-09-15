@@ -34,7 +34,7 @@ export default function BaseDashboardLayout({
         </div>
 
         <div
-          className={`flex-1 overflow-y-auto overflow-x-hidden px-0 py-4 pl-6 ${
+          className={`flex-1 overflow-y-auto overflow-x-hidden px-0 py-4 px-6 ${
             isOpenSideBar ? "ml-64" : "ml-16"
           }`}
         >
