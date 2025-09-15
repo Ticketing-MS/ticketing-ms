@@ -32,9 +32,6 @@ export function handlingLogging(
 
     // clone request & response, then pass original request
     const cloneRequest = req.clone();
-    const response = await handler(req);
-    const cloneResponse = response.clone();
-
     let requestData: Record<string, any> = {};
 
     if (
@@ -53,8 +50,6 @@ export function handlingLogging(
       }
     }
 
-    const responseJson = await cloneResponse.json();
-
     logger.info({
       message: "Request received",
       method: req.method,
@@ -63,6 +58,10 @@ export function handlingLogging(
       body: masking(requestData),
       params: req.nextUrl.searchParams,
     });
+
+    const response = await handler(req);
+    const cloneResponse = response.clone();
+    const responseJson = await cloneResponse.json();
 
     logger.info({
       message: "Response sent",
