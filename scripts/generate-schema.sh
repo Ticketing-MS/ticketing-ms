@@ -119,7 +119,7 @@ if [[ -e "$model_path" ]]; then
   echo "⚠️  Model sudah ada: $model_path"
 else
   cat > "$model_path" <<EOF
-export interface ${model_pascal} {
+export type ${model_pascal} = {
   id: string;
   createdAt: Date | null;
   updatedAt: Date | null;

@@ -1,9 +1,8 @@
-export interface TicketReply {
-  id: string;
-  ticketId: string;
-  userId: string;
-  content: string;
-  duration: number;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-}
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { ticketReplies } from "../schemas";
+
+// for insert data
+export type TicketReplyInsert = InferInsertModel<typeof ticketReplies>;
+
+// for select data
+export type TicketReply = InferSelectModel<typeof ticketReplies>;

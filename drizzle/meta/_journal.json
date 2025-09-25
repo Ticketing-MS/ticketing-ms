@@ -99,6 +99,34 @@
       "when": 1757774063224,
       "tag": "0013_brown_nightshade",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1758067787819,
+      "tag": "0014_lethal_deathstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1758475638269,
+      "tag": "0015_many_warhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1758478002828,
+      "tag": "0016_soft_alice",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1758687031045,
+      "tag": "0017_cool_starbolt",
+      "breakpoints": true
     }
   ]
 }

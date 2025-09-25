@@ -3,17 +3,16 @@ import { UpdatePasswordValidation } from "../_validation";
 import { useState } from "react";
 import TextInput from "components/forminput/TextInput";
 import { Eye, EyeClosed, SendIcon } from "lucide-react";
-import Button from "components/forminput/Button";
-import { PulseLoader } from "react-spinners";
+import PrimaryButton from "components/forminput/PrimaryButton";
 import HttpGateway from "lib/middlewares/web/HttpGateway";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export default function UpdatePassword({
-  changeTab,
-}: {
+type UpdatePasswordProps = {
   changeTab: () => void;
-}) {
+};
+
+export default function UpdatePassword({ changeTab }: UpdatePasswordProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState({
     currentPassword: false,
@@ -38,13 +37,6 @@ export default function UpdatePassword({
       } else {
         changeTab();
       }
-    } else {
-      toast.error(data.message, {
-        description: Object.entries(data.errors)
-          .map((error) => error[1])
-          .concat()
-          .toString(),
-      });
     }
 
     setIsLoading(false);
@@ -189,18 +181,16 @@ export default function UpdatePassword({
           </label>
         </div>
 
-        <Button type="submit" isDisabled={isLoading}>
+        <PrimaryButton type="submit" isDisabled={isLoading} className="w-full">
           {isLoading ? (
-            <div className="h-6 p-1">
-              <PulseLoader color="#36d7b7" size={10} />
-            </div>
+            "Processing..."
           ) : (
             <>
               <SendIcon className="h-5 mr-1" />
               Submit
             </>
           )}
-        </Button>
+        </PrimaryButton>
       </form>
     </motion.div>
   );

@@ -56,13 +56,12 @@ const menusBasedRole: MenuRoleMap = {
   ],
 };
 
-export default function Sidebar({
-  isOpen,
-  toggleSidebar,
-}: {
+type SidebarProps = {
   isOpen: boolean;
   toggleSidebar: () => void;
-}) {
+};
+
+export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const pathname = usePathname();
   const { userLogIn } = useUserLogIn();
 

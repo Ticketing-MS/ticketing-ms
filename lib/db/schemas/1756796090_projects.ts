@@ -9,7 +9,6 @@ import {
 import { teams } from "./1756793527_teams";
 import { users } from "./1756795931_users";
 import { relations } from "drizzle-orm";
-import { assignedToProjects } from "./1756796140_assigned_to_projects";
 import { ticketLabels } from "./1756796349_ticket_labels";
 import { ticketPhases } from "./1756796171_ticket_phases";
 import { tickets } from "./1756798749_tickets";
@@ -38,10 +37,13 @@ export const projects = pgTable(
 );
 
 export const projectsRelations = relations(projects, ({ one, many }) => ({
-  assignedToProjects: many(assignedToProjects),
-  team: one(teams, { fields: [projects.teamId], references: [teams.id] }),
-  author: one(users, { fields: [projects.createdBy], references: [users.id] }),
-  ticketLabels: many(ticketLabels),
+  // contributors: many(assignedToProjects),
+  teamProject: one(teams, {
+    fields: [projects.teamId],
+    references: [teams.id],
+  }),
+  creator: one(users, { fields: [projects.createdBy], references: [users.id] }),
   ticketPhases: many(ticketPhases),
+  ticketLabels: many(ticketLabels),
   tickets: many(tickets),
 }));

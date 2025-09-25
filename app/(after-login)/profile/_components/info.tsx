@@ -35,13 +35,13 @@ export default function Info() {
 
           <p className="text-sm font-semibold mt-2">Team:</p>
           <div className="text-sm text-gray-500 dark:text-gray-300">
-            {(userLogIn?.teams?.length ?? 0) > 0 ? (
-              userLogIn?.teams!.map((team) => (
-                <p key={team.name}>{team.name}</p>
-              ))
-            ) : (
-              <p>-</p>
-            )}
+            {userLogIn?.teams?.map((team) => (
+              <p key={team.id}>
+                {team.name}
+                {team.isLeader && " (leader)"}
+              </p>
+            ))}
+            {userLogIn?.teams?.length === 0 && <p>-</p>}
           </div>
         </div>
       </div>

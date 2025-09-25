@@ -1,27 +1,34 @@
-import { pgTable, primaryKey, timestamp, uuid } from "drizzle-orm/pg-core";
-import { teams } from "./1756793527_teams";
+import {
+  boolean,
+  pgTable,
+  primaryKey,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { users } from "./1756795931_users";
+import { teams } from "./1756793527_teams";
 import { relations } from "drizzle-orm";
 
 export const usersToTeams = pgTable(
   "users_to_teams",
   {
     userId: uuid("user_id")
-      .notNull()
       .references(() => users.id, {
-        onDelete: "cascade",
         onUpdate: "cascade",
-      }),
+        onDelete: "cascade",
+      })
+      .notNull(),
     teamId: uuid("team_id")
-      .notNull()
       .references(() => teams.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
-      }),
+      })
+      .notNull(),
+    isLeader: boolean("is_leader").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
   },
-  (table) => [primaryKey({ columns: [table.userId, table.teamId] })]
+  (pgTable) => [primaryKey({ columns: [pgTable.userId, pgTable.teamId] })]
 );
 
 export const usersToTeamsRelations = relations(usersToTeams, ({ one }) => ({

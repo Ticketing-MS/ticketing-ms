@@ -1,6 +1,6 @@
-import { DeviceData } from "app/api/auth/devices/dto";
 import { formatRelative } from "date-fns";
 import { motion } from "framer-motion";
+import { DeviceData } from "lib/db/dto/responses/DeviceData";
 import HttpGateway from "lib/middlewares/web/HttpGateway";
 import { MonitorSmartphone } from "lucide-react";
 import { useEffect, useState } from "react";

@@ -1,18 +1,19 @@
 import { db } from "config/db";
 import { and, desc, eq, gte, isNull } from "drizzle-orm";
-import { User } from "lib/db/models";
+import { UserWithRole } from "lib/db/models";
 import { authUsers } from "lib/db/schemas";
-import { DeviceData } from "./dto";
 import { UAParser } from "ua-parser-js";
 import { APIServerError } from "lib/errors/api/APIServerError";
+import { DeviceData } from "lib/db/dto/responses/DeviceData";
+import { NextRequest } from "next/server";
 
-export async function getDevices(req: Request): Promise<DeviceData[]> {
-  // get data user
+export async function getDevices(req: NextRequest): Promise<DeviceData[]> {
+  // get data logged in user from header
   const requestUser: string | null = req.headers.get("user");
   if (!requestUser) throw new APIServerError();
-  const userData: User = JSON.parse(requestUser);
+  const headerUser: UserWithRole = JSON.parse(requestUser);
 
-  const auths: DeviceData[] = await db
+  const authsData: DeviceData[] = await db
     .selectDistinctOn([authUsers.deviceId], {
       id: authUsers.id,
       deviceId: authUsers.deviceId,
@@ -22,7 +23,7 @@ export async function getDevices(req: Request): Promise<DeviceData[]> {
     .from(authUsers)
     .where(
       and(
-        eq(authUsers.userId, userData.id),
+        eq(authUsers.userId, headerUser.id),
         isNull(authUsers.revokedAt),
         gte(authUsers.expiresAt, new Date())
       )
@@ -30,7 +31,7 @@ export async function getDevices(req: Request): Promise<DeviceData[]> {
     .orderBy(authUsers.deviceId, desc(authUsers.createdAt));
 
   const devices: DeviceData[] = [];
-  for (const auth of auths) {
+  for (const auth of authsData) {
     const parser = new UAParser(auth.userAgent ?? "");
 
     devices.push({

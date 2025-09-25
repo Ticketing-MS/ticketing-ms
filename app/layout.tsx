@@ -3,6 +3,8 @@ import { Inter, Roboto_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { ThemeProvider } from "hooks/context/ThemeContext";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Inter({
   variable: "--font-geist-sans",
@@ -37,6 +39,8 @@ export default function RootLayout({
             closeButton
             visibleToasts={5}
           />
+          <SpeedInsights />
+          <Analytics />
         </body>
       </html>
     </ThemeProvider>

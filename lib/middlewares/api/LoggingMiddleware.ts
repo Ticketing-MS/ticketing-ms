@@ -14,7 +14,7 @@ function masking(data: Record<string, any>): string {
       data[key] = "[...]";
     } else if (value instanceof File) {
       data[key] = "File {...}";
-    } else if (typeof value === "object") {
+    } else if (typeof value === "object" && value !== null) {
       data[key] = "{...}";
     } else if (maskingProps.some((prop) => prop === key)) {
       data[key] = "******";
@@ -25,10 +25,10 @@ function masking(data: Record<string, any>): string {
 }
 
 export function handlingLogging(
-  handler: (req: NextRequest) => Promise<NextResponse>
+  handler: (_req: NextRequest) => Promise<NextResponse>
 ) {
   return async function (req: NextRequest): Promise<NextResponse> {
-    req.headers.get("x-request-id");
+    const requestId: string = req.headers.get("x-request-id") ?? "";
 
     // clone request & response, then pass original request
     const cloneRequest = req.clone();
@@ -38,8 +38,7 @@ export function handlingLogging(
       cloneRequest.body &&
       req.headers.get("Content-Type")?.includes("application/json")
     ) {
-      const rawRequest = await cloneRequest.text();
-      requestData = JSON.parse(rawRequest);
+      requestData = await cloneRequest.json();
     } else if (
       cloneRequest.body &&
       req.headers.get("Content-Type")?.includes("multipart/form-data;")
@@ -54,7 +53,7 @@ export function handlingLogging(
       message: "Request received",
       method: req.method,
       path: req.nextUrl.pathname,
-      requestId: req.headers.get("x-request-id"),
+      requestId: requestId,
       body: masking(requestData),
       params: req.nextUrl.searchParams,
     });
@@ -68,7 +67,7 @@ export function handlingLogging(
       request: {
         method: req.method,
         path: req.nextUrl.pathname,
-        requestId: req.headers.get("x-request-id"),
+        requestId: requestId,
       },
       status: cloneResponse.status,
       data:

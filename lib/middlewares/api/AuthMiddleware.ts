@@ -1,7 +1,7 @@
 import { db } from "config/db";
 import { logger } from "config/winston";
 import { and, eq, gte, isNull } from "drizzle-orm";
-import { AuthUser, User } from "lib/db/models";
+import { AuthUser, UserWithRole } from "lib/db/models";
 import { authUsers, users } from "lib/db/schemas";
 import { APIAuthenticationError } from "lib/errors/api/APIAuthenticationError";
 import { APIAuthorizationError } from "lib/errors/api/APIAuthorizationError";
@@ -10,12 +10,12 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export function handlingAuth(
-  handler: (req: NextRequest) => Promise<NextResponse>,
+  handler: (_req: NextRequest) => Promise<NextResponse>,
   roles: string[] = []
 ) {
   return async function (req: NextRequest): Promise<NextResponse> {
     // verify access token
-    const accessToken: string = cookies().get("accessToken")?.value ?? "";
+    const accessToken: string | undefined = cookies().get("accessToken")?.value;
 
     if (!accessToken) {
       logger.error("invalid access token");
@@ -26,11 +26,14 @@ export function handlingAuth(
     const decoded: any = await decodeAccessToken(accessToken);
 
     // verify user
-    const user: User | undefined = await db.query.users.findFirst({
+    const userData: UserWithRole | undefined = await db.query.users.findFirst({
+      with: {
+        role: true,
+      },
       where: eq(users.id, decoded.userId),
     });
 
-    if (!user) {
+    if (!userData) {
       logger.error("user not found");
       throw new APIAuthenticationError();
     }
@@ -57,8 +60,8 @@ export function handlingAuth(
     // validate authorization based role
     if (roles?.length > 0) {
       if (
-        roles.some(
-          (role) => role.toLowerCase() === user?.role?.name.toLowerCase()
+        !roles.some(
+          (role) => role.toLowerCase() === userData.role?.name.toLowerCase()
         )
       ) {
         logger.error("unauthorized access");
@@ -66,7 +69,7 @@ export function handlingAuth(
       }
     }
 
-    req.headers.set("user", JSON.stringify(user));
+    req.headers.set("user", JSON.stringify(userData));
 
     return await handler(req);
   };

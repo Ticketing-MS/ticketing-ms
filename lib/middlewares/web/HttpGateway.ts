@@ -7,7 +7,7 @@ type ResponseData = {
   status: string;
   message: string;
   data?: any;
-  errors?: any;
+  errors?: Record<string, string>;
 };
 
 export interface ApiResponse {
@@ -22,7 +22,7 @@ export default class HttpGateway {
     body: any,
     headers?: Record<string, string>
   ): Promise<ApiResponse> => {
-    let responseJson = {
+    let responseJson: ResponseData = {
       status: "",
       message: "",
     };
@@ -51,7 +51,23 @@ export default class HttpGateway {
     });
 
     if (response.headers.get("Content-Type")?.includes("application/json")) {
-      responseJson = (await response.json()) as ResponseData;
+      responseJson = await response.json();
+    }
+
+    // show toast message
+    if (
+      response.status === 400 ||
+      response.status === 403 ||
+      response.status === 404 ||
+      response.status === 409 ||
+      response.status === 500
+    ) {
+      toast.error(responseJson.message, {
+        description: Object.entries(responseJson.errors ?? {})
+          .map((error) => error[1])
+          .concat()
+          .toString(),
+      });
     }
 
     return { status: response.status, data: responseJson };
@@ -63,7 +79,7 @@ export default class HttpGateway {
     body?: any,
     headers?: Record<string, string>
   ): Promise<ApiResponse> => {
-    let responseJson = {
+    let responseJson: ResponseData = {
       status: "",
       message: "",
     };
@@ -78,7 +94,23 @@ export default class HttpGateway {
     });
 
     if (response.headers.get("Content-Type")?.includes("application/json")) {
-      responseJson = (await response.json()) as ResponseData;
+      responseJson = await response.json();
+    }
+
+    // show toast message
+    if (
+      response.status === 400 ||
+      response.status === 403 ||
+      response.status === 404 ||
+      response.status === 409 ||
+      response.status === 500
+    ) {
+      toast.error(responseJson.message, {
+        description: Object.entries(responseJson.errors ?? {})
+          .map((error) => error[1])
+          .concat()
+          .toString(),
+      });
     }
 
     return { status: response.status, data: responseJson };

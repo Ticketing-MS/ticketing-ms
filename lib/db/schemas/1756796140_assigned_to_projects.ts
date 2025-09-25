@@ -3,6 +3,8 @@ import { projects } from "./1756796090_projects";
 import { users } from "./1756795931_users";
 import { relations } from "drizzle-orm";
 
+// ini hanya untuk assign project seperti di oli, bukan untuk assign project di ticketnig
+// setiap anggota tim bisa saja berkontribusi di project tim tersebut
 export const assignedToProjects = pgTable(
   "assigned_to_projects",
   {

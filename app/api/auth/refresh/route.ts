@@ -1,11 +1,12 @@
 import { handlingError } from "lib/middlewares/api/ErrorMiddleware";
 import { handlingLogging } from "lib/middlewares/api/LoggingMiddleware";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { refreshToken } from "./service";
 import { cookies } from "next/headers";
+import { AuthData } from "lib/db/dto/responses/AuthData";
 
-async function postHandler(req: Request): Promise<NextResponse> {
-  const result: Record<string, string> = await refreshToken(req);
+async function postHandler(req: NextRequest): Promise<NextResponse> {
+  const result: AuthData = await refreshToken(req);
 
   cookies().set("accessToken", result.accessToken, {
     httpOnly: false,

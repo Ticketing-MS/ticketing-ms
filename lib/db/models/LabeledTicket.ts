@@ -1,6 +1,8 @@
-export interface LabeledTicket {
-  ticketId: string;
-  ticketLabelId: string;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-}
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { labeledTickets } from "../schemas";
+
+// for insert data
+export type LabeledTicketInsert = InferInsertModel<typeof labeledTickets>;
+
+// for select data
+export type LabeledTicket = InferSelectModel<typeof labeledTickets>;

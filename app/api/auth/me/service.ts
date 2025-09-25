@@ -1,55 +1,54 @@
-import { LoginResponse } from "app/api/auth/login/dto";
 import { db } from "config/db";
-import { and, eq, not } from "drizzle-orm";
-import { getTeamByUserId, User } from "lib/db/models";
+import { and, count, eq, not } from "drizzle-orm";
+import { User, UserWithRole, UserWithRoleTeam } from "lib/db/models";
 import { users } from "lib/db/schemas";
 import { APIAuthenticationError } from "lib/errors/api/APIAuthenticationError";
 import { APIServerError } from "lib/errors/api/APIServerError";
-import { UpdateProfilePayload } from "./dto";
 import cloudinary from "config/cloudinary";
 import { APIValidationError } from "lib/errors/api/APIValidationError";
+import { UserData } from "lib/db/dto/responses/UserData";
+import { UpdateProfilePayload } from "lib/db/dto/payloads/UpdateProfilePayload";
+import { logger } from "config/winston";
+import { NextRequest } from "next/server";
+import { mapperSingleUserWithRoleTeam } from "lib/db/mapper/UserToTeam";
 
-export async function getProfile(req: Request): Promise<LoginResponse> {
-  // get data user
+export async function getProfile(req: NextRequest): Promise<UserData> {
+  // get data logged in user from header
   const requestUser: string | null = req.headers.get("user");
   if (!requestUser) throw new APIServerError();
-  const userData: User = JSON.parse(requestUser);
+  const headerUser: UserWithRole = JSON.parse(requestUser);
 
-  const user = (await db.query.users.findFirst({
-    where: eq(users.id, userData.id),
-    with: {
-      role: true,
-    },
-  })) as (User & { role: User["role"] | null }) | undefined;
+  const userData: UserWithRoleTeam | undefined = await db.query.users.findFirst(
+    {
+      where: eq(users.id, headerUser.id),
+      with: {
+        role: true,
+        usersToTeams: {
+          with: {
+            team: true,
+          },
+        },
+      },
+    }
+  );
 
-  if (user === undefined) {
+  if (!userData) {
+    logger.error("user not found");
     throw new APIAuthenticationError();
   }
 
-  // get user team
-  user.teams = await getTeamByUserId(user.id);
-
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    avatarUrl: user.avatarUrl,
-    isActive: user.isActive,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    role: user.role,
-    teams: user.teams,
-  };
+  return mapperSingleUserWithRoleTeam(userData);
 }
 
 export async function updateProfile(
-  req: Request,
+  req: NextRequest,
   payload: UpdateProfilePayload
 ): Promise<void> {
-  // get data user
+  // get data logged in user from header
   const requestUser: string | null = req.headers.get("user");
   if (!requestUser) throw new APIServerError();
-  const userData: User = JSON.parse(requestUser);
+  const headerUser: User = JSON.parse(requestUser);
+
   const updatedData: Record<string, any> = {
     name: payload.name,
     email: payload.email,
@@ -59,7 +58,7 @@ export async function updateProfile(
   if (payload.avatar) {
     // get public id
     const regex = /avatars\/.*/;
-    const match = regex.exec(userData.avatarUrl ?? "");
+    const match = regex.exec(headerUser.avatarUrl ?? "");
     let publicId = "";
     if (match && match[0]) publicId = match[0].split(".")[0];
 
@@ -67,6 +66,7 @@ export async function updateProfile(
     await cloudinary.api.delete_resources([publicId]);
 
     // upload image to cloudinary
+    logger.info("start upload image to cloudinary");
     const arrayBuffer: ArrayBuffer = await payload.avatar.arrayBuffer();
     const buffer: Buffer = Buffer.from(arrayBuffer);
     const result: any = await new Promise((resolve) => {
@@ -84,17 +84,22 @@ export async function updateProfile(
         .end(buffer);
     });
     updatedData.avatarUrl = result.secure_url;
+    logger.info("finish upload image to cloudinary");
   }
 
   // check unique email
-  const existEmail: User | undefined = await db.query.users.findFirst({
-    where: and(not(eq(users.id, userData.id)), eq(users.email, payload.email)),
-  });
+  const counterUser: { countUser: number }[] = await db
+    .select({ countUser: count(users.id) })
+    .from(users)
+    .where(
+      and(not(eq(users.id, headerUser.id)), eq(users.email, payload.email))
+    );
 
-  if (existEmail) {
+  if (counterUser[0].countUser) {
+    logger.error("email is already used by other user");
     throw new APIValidationError({ email: "Email already in used" });
   }
 
   // update data
-  await db.update(users).set(updatedData).where(eq(users.id, userData.id));
+  await db.update(users).set(updatedData).where(eq(users.id, headerUser.id));
 }

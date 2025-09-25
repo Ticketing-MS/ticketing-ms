@@ -1,22 +1,22 @@
 import { db } from "../../../config/db";
 import { fakerID_ID as faker } from "@faker-js/faker";
 import { projects, ticketPhases, tickets, users } from "../schemas";
-import { Project, TicketPhase, User } from "../models";
+import { Project, TicketInsert, TicketPhase, User } from "../models";
 
 export async function up() {
   const projectsData: Project[] = await db.select().from(projects);
   const ticketPhasesData: TicketPhase[] = await db.select().from(ticketPhases);
   const usersData: User[] = await db.select().from(users);
-  const data: any[] = [];
+  const data: TicketInsert[] = [];
 
   for (const project of projectsData) {
-    let backlogOrder = 1;
-    let inProgressOrder = 1;
-    let completedOrder = 1;
+    let backlogOrder: number = 1;
+    let inProgressOrder: number = 1;
+    let completedOrder: number = 1;
 
     for (let i = 0; i < 10; i++) {
-      const phase = faker.helpers.arrayElement(ticketPhasesData);
-      let ticketOrder = 0;
+      const phase: TicketPhase = faker.helpers.arrayElement(ticketPhasesData);
+      let ticketOrder: number = 0;
 
       switch (phase.name) {
         case "Backlog":

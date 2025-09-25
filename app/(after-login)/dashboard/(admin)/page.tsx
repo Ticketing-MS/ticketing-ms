@@ -1,3 +1,7 @@
 export default function DashboardAdminPage() {
-  return <div className="h-screen">content dashboard admin</div>;
+  return (
+    <div className="h-dvh">
+      <p>content dashboard admin</p>
+    </div>
+  );
 }

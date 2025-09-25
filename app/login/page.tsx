@@ -4,10 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import LoginValidation from "./_validation";
 import TextInput from "components/forminput/TextInput";
-import { PulseLoader } from "react-spinners";
 import { toast } from "sonner";
 import ToggleTheme from "components/ToggleTheme";
-import Button from "components/forminput/Button";
+import PrimaryButton from "components/forminput/PrimaryButton";
 import { Eye, EyeClosed, LogIn } from "lucide-react";
 import HttpGateway from "lib/middlewares/web/HttpGateway";
 
@@ -34,7 +33,7 @@ export default function LoginPage() {
       toast.success(data.message);
       sessionStorage.setItem("user", JSON.stringify(data.data));
       router.replace("/dashboard");
-    } else {
+    } else if (status === 401) {
       toast.error(data.message);
     }
   };
@@ -91,18 +90,20 @@ export default function LoginPage() {
                 </button>
               </div>
 
-              <Button type="submit" isDisabled={isLoading}>
+              <PrimaryButton
+                type="submit"
+                isDisabled={isLoading}
+                className="w-full"
+              >
                 {isLoading ? (
-                  <div className="h-6 p-1">
-                    <PulseLoader color="#36d7b7" size={10} />
-                  </div>
+                  "Processing..."
                 ) : (
                   <>
                     <LogIn className="h-5 mr-1" />
                     Sign In
                   </>
                 )}
-              </Button>
+              </PrimaryButton>
             </form>
           </div>
         </div>

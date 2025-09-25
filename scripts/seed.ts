@@ -30,6 +30,7 @@ async function run(cmd: "up" | "down", only?: string) {
     const m = await load(full);
     const fn = m[cmd];
     if (typeof fn === "function") {
+      console.log("");
       console.log(`${cmd.toUpperCase()}: ${f}`);
       await fn();
     } else {

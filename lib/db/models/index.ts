@@ -1,7 +1,6 @@
 export * from "./Role";
 export * from "./Team";
 export * from "./User";
-export * from "./UserToTeam";
 export * from "./AuthUser";
 export * from "./Project";
 export * from "./AssignedToProject";
@@ -10,5 +9,5 @@ export * from "./TicketLabel";
 export * from "./Ticket";
 export * from "./LabeledTicket";
 export * from "./AssignedToTicket";
-export * from "./SubTicket";
 export * from "./TicketReply";
+export * from "./UserToTeam";

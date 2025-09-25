@@ -3,7 +3,11 @@
 import { useTheme } from "hooks/context/ThemeContext";
 import { Moon, Sun } from "lucide-react";
 
-export default function ToggleTheme({ className }: { className?: string }) {
+type ToggleThemeProps = {
+  className?: string;
+};
+
+export default function ToggleTheme({ className }: ToggleThemeProps) {
   const { theme, toggleTheme } = useTheme();
 
   return (

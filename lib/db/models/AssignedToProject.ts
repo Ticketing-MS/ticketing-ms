@@ -1,6 +1,10 @@
-export interface AssignedToProject {
-  projectId: string;
-  userId: string;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-}
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { assignedToProjects } from "../schemas";
+
+// for insert data
+export type AssignedToProjectInsert = InferInsertModel<
+  typeof assignedToProjects
+>;
+
+// for select data
+export type AssignedToProject = InferSelectModel<typeof assignedToProjects>;

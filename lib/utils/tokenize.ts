@@ -1,8 +1,9 @@
 import { SignJWT, jwtVerify } from "jose";
 
-interface TokenPayload {
+type TokenPayload = {
   userId: string;
-}
+  deviceId: string;
+};
 
 export function createRefreshToken(): string {
   const chars =
@@ -15,7 +16,7 @@ export function createRefreshToken(): string {
 }
 
 function getSecret() {
-  // jose butuh Uint8Array
+  // jose need Uint8Array
   return new TextEncoder().encode(process.env.JWT_SECRET as string);
 }
 

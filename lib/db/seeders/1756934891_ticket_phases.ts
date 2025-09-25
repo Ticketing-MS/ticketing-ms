@@ -1,6 +1,6 @@
 import { db } from "../../../config/db";
 import { projects, ticketPhases } from "../schemas";
-import { Project } from "../models";
+import { Project, TicketPhasesInsert } from "../models";
 
 export async function up() {
   const projectsData: Project[] = await db.select().from(projects);
@@ -18,7 +18,7 @@ export async function up() {
       order: 3,
     },
   ];
-  const data: any[] = [];
+  const data: TicketPhasesInsert[] = [];
 
   for (const project of projectsData) {
     for (const phase of phases) {

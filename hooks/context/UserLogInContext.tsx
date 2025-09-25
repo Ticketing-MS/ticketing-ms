@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { User } from "lib/db/models";
+import { UserData } from "lib/db/dto/responses/UserData";
 import HttpGateway from "lib/middlewares/web/HttpGateway";
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface UserLogInContextType {
-  userLogIn?: User;
+  userLogIn?: UserData;
   changeUserLogIn: () => void;
 }
 
@@ -22,14 +22,14 @@ export const UserLogInProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [userLogIn, setUserLogIn] = useState<User>();
+  const [userLogIn, setUserLogIn] = useState<UserData>();
 
   const fetchUser = async () => {
     const { status, data } = await HttpGateway.secureHttpGet("/api/auth/me");
-    const user: User = data.data;
-    setUserLogIn(user);
 
     if (status === 200) {
+      const user: UserData = data.data;
+      setUserLogIn(user);
       sessionStorage.setItem("user", JSON.stringify(user));
     }
   };

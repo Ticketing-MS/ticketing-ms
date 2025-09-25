@@ -1,29 +1,8 @@
-import { db } from "config/db";
-import { and } from "drizzle-orm";
-import { usersToTeams } from "../schemas";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { teams } from "../schemas";
 
-export interface Team {
-  id: string;
-  name: string;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-}
+// for insert data
+export type TeamInsert = InferInsertModel<typeof teams>;
 
-export async function getTeamByUserId(userId: string): Promise<Team[]> {
-  const teams: Team[] = await db.query.teams.findMany({
-    where: (teams, { exists, eq }) =>
-      exists(
-        db
-          .select()
-          .from(usersToTeams)
-          .where(
-            and(
-              eq(usersToTeams.teamId, teams.id),
-              eq(usersToTeams.userId, userId)
-            )
-          )
-      ),
-  });
-
-  return teams;
-}
+// for select data
+export type Team = InferSelectModel<typeof teams>;

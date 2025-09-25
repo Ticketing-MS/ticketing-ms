@@ -1,18 +1,18 @@
 "use client";
 
-interface TextInputProps {
+type TextInputProps = {
   name: string;
   label: string;
   type?: string;
   error: boolean;
   touched: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onBlur: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (_e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur: (_e: React.ChangeEvent<HTMLInputElement>) => void;
   autoComplete?: string;
   helperText?: string;
   value?: string; // optional to support file input
   className?: string;
-}
+};
 
 export default function TextInput({
   name,
@@ -49,7 +49,7 @@ export default function TextInput({
       />
 
       {error && touched && (
-        <label className="text-sm text-red-500">{helperText}</label>
+        <p className="text-sm text-red-500 inline">{helperText}</p>
       )}
     </>
   );

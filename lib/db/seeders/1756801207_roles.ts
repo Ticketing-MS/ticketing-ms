@@ -1,10 +1,10 @@
 import { roles } from "../schemas";
 import { db } from "../../../config/db";
+import { RoleInsert } from "../models";
 
 export async function up() {
-  const data: any[] = [
+  const data: RoleInsert[] = [
     { name: "admin" },
-    { name: "team lead" },
     { name: "consultant" },
     { name: "project coordinator" },
   ];

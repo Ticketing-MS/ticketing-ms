@@ -2,14 +2,14 @@ import { logger } from "config/winston";
 import { APIResponseError } from "lib/errors/api/APIResponseError";
 import { NextRequest, NextResponse } from "next/server";
 
-interface ResponseError {
+type ResponseError = {
   status: string;
   message: string;
   errors?: Record<string, string>;
-}
+};
 
 export function handlingError(
-  handler: (req: NextRequest) => Promise<NextResponse>
+  handler: (_req: NextRequest) => Promise<NextResponse>
 ) {
   return async function (req: NextRequest): Promise<NextResponse> {
     try {

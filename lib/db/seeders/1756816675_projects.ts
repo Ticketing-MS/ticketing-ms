@@ -1,20 +1,18 @@
 import { db } from "../../../config/db";
-import { teams, users, projects } from "../schemas";
-import { Team, User } from "../models";
+import { users, projects } from "../schemas";
+import { ProjectInsert, Team, User } from "../models";
 import { fakerID_ID as faker } from "@faker-js/faker";
 import { generateSlug } from "lib/utils/slug";
-import { eq, not } from "drizzle-orm";
+import { notInArray } from "drizzle-orm";
 
 export async function up() {
-  const teamData: Team[] = await db.query.teams.findMany({
-    where: not(eq(teams.name, "Project Coordinator")),
+  const teamsData: Team[] = await db.query.teams.findMany();
+  const usersData: User[] = await db.query.users.findMany({
+    where: notInArray(users.name, ["Admin", "Dul"]),
   });
-  const userData: User[] = await db.query.users.findMany({
-    where: not(eq(users.name, "Admin")),
-  });
-  const data: any[] = [];
+  const data: ProjectInsert[] = [];
 
-  for (const team of teamData) {
+  for (const team of teamsData) {
     for (let i = 0; i < 5; i++) {
       const projectName = faker.company.name();
       const tmpData = {
@@ -22,7 +20,7 @@ export async function up() {
         name: projectName,
         slug: generateSlug(projectName),
         description: faker.company.catchPhrase(),
-        createdBy: faker.helpers.arrayElement(userData).id,
+        createdBy: faker.helpers.arrayElement(usersData).id,
       };
 
       data.push(tmpData);

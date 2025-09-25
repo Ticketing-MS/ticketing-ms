@@ -4,11 +4,13 @@ import Navbar from "components/Navbar";
 import Sidebar from "components/Sidebar";
 import { useEffect, useState } from "react";
 
+type BaseDashboardLayoutProps = {
+  children: React.ReactNode;
+};
+
 export default function BaseDashboardLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: BaseDashboardLayoutProps) {
   const [isOpenSideBar, setIsOpenSidebar] = useState(false);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function BaseDashboardLayout({
         </div>
 
         <div
-          className={`flex-1 overflow-y-auto overflow-x-hidden px-0 py-4 px-6 ${
+          className={`flex-1 overflow-y-auto overflow-x-hidden px-0 py-4 px-6 mt-3 ${
             isOpenSideBar ? "ml-64" : "ml-16"
           }`}
         >

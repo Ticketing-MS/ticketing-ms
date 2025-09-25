@@ -28,10 +28,12 @@ export default function Navbar() {
   }, []);
 
   const getTitle = () => {
-    return `${userLogIn?.role?.name
-      .split(" ")
-      .map((word) => `${word[0].toUpperCase()}${word.substring(1)}`)
-      .join(" ")} Panel`;
+    return `${
+      userLogIn?.role?.name
+        .split(" ")
+        .map((word) => `${word[0].toUpperCase()}${word.substring(1)}`)
+        .join(" ") ?? "User"
+    } Panel`;
   };
 
   const getInitials = () => {
