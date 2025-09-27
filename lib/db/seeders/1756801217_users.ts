@@ -59,7 +59,7 @@ export async function up() {
       email: "dul@gmail.com",
       name: "Dul",
       password: await hashing("test123"),
-      roleId: roleData.find((role) => role.name === "consultant")?.id,
+      roleId: roleData.find((role) => role.name === "project coordinator")?.id,
     },
   ];
 
