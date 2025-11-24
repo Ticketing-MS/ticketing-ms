@@ -1,1 +1,0 @@
-ALTER TABLE "auth_users" DROP COLUMN "replaced_by";

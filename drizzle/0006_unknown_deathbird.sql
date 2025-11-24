@@ -1,1 +1,0 @@
-ALTER TABLE "ticket_phases" ALTER COLUMN "project_id" SET NOT NULL;

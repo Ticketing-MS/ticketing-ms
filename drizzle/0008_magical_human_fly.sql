@@ -1,1 +1,0 @@
-ALTER TABLE "auth_users" RENAME COLUMN "login_at" TO "login_from";

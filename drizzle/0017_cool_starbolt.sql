@@ -1,1 +1,0 @@
-ALTER TABLE "users_to_teams" ADD COLUMN "is_leader" boolean DEFAULT false NOT NULL;

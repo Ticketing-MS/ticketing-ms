@@ -1,1 +1,0 @@
-ALTER TABLE "auth_users" ADD COLUMN "ip" varchar(20);
